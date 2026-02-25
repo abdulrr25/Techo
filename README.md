@@ -1,14 +1,160 @@
-## Project Info
-This project provides a platform where anyone can host their online lectures. They can describe the pricing in terms of flow rate. Those who buy these will have to pay 10% of the amount in advance to create some trust. Now, once there is some trust between the lecturer and the attendee, they can launch a meeting at the mentioned time with the help of Huddle01 SDK. For the duration of the meeting, a stream of money between the attendee and the lecturer will be generated using superfluid CFA. The stream flow stops whenever an attendee ends the meeting. As a result, the user has more control and only has to pay if the course is valuable. </br>
-If multiple people buy a course from the same lecturer, they will be minted with an NFT representing a group of people who can join the same meeting room.
+# 🚀 TEACHO  
+### Pay-Per-Second Decentralized Live Learning Platform
 
-</br>
-</br>
+> A blockchain-powered live education platform where students pay **only for the time they learn.**
+
+---
+
+## 📌 Overview
+
+TEACHO is a decentralized online lecture platform that enables lecturers to monetize their sessions using **real-time payment streaming**.
+
+Instead of paying full course fees upfront, students:
+
+- Pay only **10% advance** to confirm booking  
+- Join the live lecture  
+- Pay per second during the session  
+- Stop paying instantly when they leave  
+
+This creates a **fair, transparent, and trust-based learning economy**.
+
+---
+
+## 🧠 Problem
+
+Traditional online learning platforms:
+
+- Require full upfront payments  
+- Offer no real-time refund control  
+- Lock users into fixed pricing  
+- Operate on centralized payment systems  
+
+Students take the risk.  
+There is no transparency or flexibility.
+
+---
+
+## 💡 Solution
+
+TEACHO introduces:
+
+- ✅ 10% trust-based advance model  
+- ✅ Real-time per-second payment streaming  
+- ✅ Automatic stop on meeting exit  
+- ✅ NFT-based lecture access  
+- ✅ Fully on-chain transparency  
+
+---
+
+## 🏗️ System Architecture
+
+```
+Lecturer creates lecture (sets flow rate)
+            ↓
+Student pays 10% advance
+            ↓
+NFT minted as access pass
+            ↓
+Live meeting starts (Huddle01)
+            ↓
+Superfluid stream begins (per-second payment)
+            ↓
+Stream stops when session ends
+```
+
+---
+
+## ⚙️ Tech Stack
+
+| Layer | Technology |
+|-------|------------|
+| Frontend | React.js / Next.js |
+| Backend | Node.js / Express |
+| Smart Contracts | Solidity |
+| Network | Base Sepolia |
+| Streaming Protocol | Superfluid CFA |
+| Video SDK | Huddle01 |
+| NFT Standard | ERC-721 |
+
+---
+
+## 🔗 Smart Contract
+
+**Network:** Base Sepolia  
+**Contract Address:**  
+https://sepolia.base.com/address/0xF8E9F063228eb47137101eb863BF3976466AA31F
+
+---
+
+## 🔥 Core Features
+
+### 1️⃣ Lecture Creation
+- Lecturer sets:
+  - Title
+  - Description
+  - Flow rate (tokens per second)
+  - Schedule time
+- Stored on-chain
+
+---
+
+### 2️⃣ Booking with 10% Advance
+- Student pays partial amount  
+- Creates commitment  
+- NFT minted as proof of booking  
+
+---
+
+### 3️⃣ NFT-Based Access Control
+- ERC-721 token issued per booking  
+- Acts as:
+  - 🎟 Access pass  
+  - 🧾 Proof of ownership  
+  - 👥 Group membership credential  
+
+Only NFT holders can join the session.
+
+---
+
+### 4️⃣ Live Lecture (Huddle01 Integration)
+- Video
+- Audio
+- Screen sharing
+- Wallet-based access authentication
+
+Meeting launch triggers the payment stream.
+
+---
+
+### 5️⃣ Real-Time Payment Streaming (Superfluid CFA)
+- Tokens flow per second  
+- Stream auto-stops when user exits  
+- No manual refund required  
+- Fully decentralized payment logic  
+
+Students only pay if the lecture is valuable.
+
+---
 
 
-<br />
-[Demo Video](https://youtu.be/88_QtgqihZU)
-<br />
-[Contract Info](https://sepolia.base.com/address/0xF8E9F063228eb47137101eb863BF3976466AA31F)
+## 🎥 Demo
 
-# Techo
+Demo Video:  
+https://youtu.be/88_QtgqihZU
+
+---
+
+## 🚀 Future Improvements
+
+- Multi-chain deployment  
+- Lecturer reputation scoring  
+- On-chain course completion certificates  
+- DAO-based educator governance  
+- AI-powered lecture matching  
+
+---
+
+
+## 📜 License
+
+This project is built for educational and research purposes.
