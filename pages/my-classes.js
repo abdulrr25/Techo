@@ -1,168 +1,248 @@
+import { formatEther } from "ethers";
 import { useState, useEffect } from "react";
-import { ethers } from "ethers";
-import {
-    address,
-    abi,
-    forwarderAddress,
-    forwarderABI,
-    superTokenAddress,
-} from "../config.js";
-import styles from "../styles/style";
-import { Navbar } from "../components";
-import { useRouter } from 'next/router';
+import { useRouter } from "next/router";
+import { useWeb3 } from "../hooks/useWeb3";
+import Navbar from "../components/Navbar";
+import { Box, Container, Flex, Grid, Heading, Text, useToast, HStack } from "@chakra-ui/react";
+import { motion } from "framer-motion";
+
+const ease = [0.22, 1, 0.36, 1];
+const fadeUp = { hidden: { opacity: 0, y: 16 }, show: { opacity: 1, y: 0, transition: { duration: 0.5, ease } } };
+const stagger = { show: { transition: { staggerChildren: 0.07 } } };
+
+function ClassCard({ cls, onJoin }) {
+  const totalEth = cls.stringFlowRate
+    ? parseFloat(formatEther(cls.stringFlowRate.toString())).toFixed(6) : "0";
+  const short = cls.host ? `${cls.host.slice(0, 6)}…${cls.host.slice(-4)}` : "Unknown";
+
+  return (
+    <motion.div variants={fadeUp}>
+      <Box className="card card-hover" display="flex" flexDirection="column" h="full">
+        <Box h="1px" bg="linear-gradient(to right, rgba(99,102,241,0.6), transparent)" />
+        <Box p={6} flex="1" display="flex" flexDirection="column">
+          <Flex justify="space-between" align="flex-start" mb={3}>
+            <Heading fontSize="15px" fontWeight="600" color="#fafafa"
+              letterSpacing="-0.02em" lineHeight="1.4" noOfLines={2} flex={1} mr={3}>
+              {cls.title}
+            </Heading>
+            <Box className="chip" flexShrink={0}>{Number(cls.attendees)} enrolled</Box>
+          </Flex>
+
+          <Text color="#71717a" fontSize="13px" lineHeight="1.6" noOfLines={3} mb={5} flex="1">
+            {cls.description}
+          </Text>
+
+          <Flex align="center" gap={2} mb={3}>
+            <Box w="18px" h="18px" borderRadius="full" bg="rgba(255,255,255,0.07)"
+              border="1px solid rgba(255,255,255,0.08)" display="flex" alignItems="center"
+              justifyContent="center" fontSize="9px" color="#a1a1aa" fontWeight="600" flexShrink={0}>
+              {cls.host ? cls.host.slice(2, 4).toUpperCase() : "??"}
+            </Box>
+            <Text fontSize="12px" fontFamily="'JetBrains Mono', monospace" color="#52525b">{short}</Text>
+          </Flex>
+
+          {cls.time && <Text fontSize="12px" color="#52525b" mb={4}>🗓 {cls.time}</Text>}
+
+          <Box className="divider-soft" mb={4} />
+
+          <Flex justify="space-between" mb={5}>
+            <Box>
+              <Text fontSize="11px" color="#52525b" mb={1}>Rate</Text>
+              <Text fontSize="12px" fontFamily="'JetBrains Mono', monospace" color="#a1a1aa">{totalEth} ETH/hr</Text>
+            </Box>
+            <Box textAlign="right">
+              <Text fontSize="11px" color="#52525b" mb={1}>Room ID</Text>
+              <Text fontSize="11px" fontFamily="'JetBrains Mono', monospace" color="#52525b"
+                noOfLines={1} maxW="130px">{cls.meetingId}</Text>
+            </Box>
+          </Flex>
+
+          <button className="btn-secondary" onClick={() => onJoin(cls)}
+            style={{ width: "100%", height: 40 }}>
+            🎥 Join Class
+          </button>
+        </Box>
+      </Box>
+    </motion.div>
+  );
+}
+
+function CardSkeleton() {
+  const pulse = { opacity: [0.4, 0.7, 0.4], transition: { duration: 1.5, repeat: Infinity, ease: "easeInOut" } };
+  return (
+    <Box className="card" p={6}>
+      <motion.div animate={pulse}>
+        <Box h="1px" bg="rgba(255,255,255,0.06)" mb={5} />
+        <Box h="18px" bg="rgba(255,255,255,0.05)" borderRadius="6px" mb={3} w="70%" />
+        <Box h="13px" bg="rgba(255,255,255,0.04)" borderRadius="6px" mb={2} />
+        <Box h="13px" bg="rgba(255,255,255,0.04)" borderRadius="6px" mb={5} w="75%" />
+        <Box h="36px" bg="rgba(255,255,255,0.04)" borderRadius="9999px" />
+      </motion.div>
+    </Box>
+  );
+}
+
+const TABS = ["All", "Hosted", "Enrolled"];
 
 export default function MyClasses() {
-    const router = useRouter();
-    const [gigs, setGigs] = useState([]);
-    const [userAddress, setUserAddress] = useState();
+  const [classes, setClasses] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [activeTab, setActiveTab] = useState(0);
+  const router = useRouter();
+  const toast = useToast();
+  const { account, isConnected, contract, connect } = useWeb3();
 
-    async function joinMeeting(prop) {
-        if (!prop.meetingId) {
-            console.error("❌ Error: Missing meeting ID. Cannot join.");
-            return;
-        }
-        console.log("✅ Joining Meeting:", prop.meetingId);
-        router.push(`/${prop.meetingId}`);
+  useEffect(() => {
+    if (account && contract) fetchMyClasses();
+    else if (!isConnected) setLoading(false);
+  }, [account, contract, isConnected]);
+
+  const fetchMyClasses = async () => {
+    try {
+      setLoading(true); setError(null);
+      const all = await contract.myClasses(account);
+      setClasses(all.filter((c) => c.gigId > 0n));
+    } catch (err) {
+      setError("Failed to fetch your classes. Make sure your wallet is on Base Sepolia.");
+    } finally { setLoading(false); }
+  };
+
+  const joinMeeting = (cls) => {
+    if (!cls.meetingId) {
+      toast({ title: "No meeting ID", status: "error", duration: 4000, isClosable: true }); return;
     }
+    router.push(`/${cls.meetingId}?gigId=${cls.gigId}&host=${cls.host}&flowRate=${cls.flowRate}`);
+  };
 
-    useEffect(() => {
-        fetchUserAddress();
-        fetchMyClasses();
-    }, []);
+  const hosted   = classes.filter(c => c.host?.toLowerCase() === account?.toLowerCase());
+  const enrolled = classes.filter(c => c.host?.toLowerCase() !== account?.toLowerCase());
+  const tabItems = [classes, hosted, enrolled];
+  const counts   = [classes.length, hosted.length, enrolled.length];
 
-    async function fetchUserAddress() {
-        try {
-            const provider = new ethers.providers.Web3Provider(window.ethereum);
-            let accounts = await provider.send("eth_requestAccounts", []);
-            let senderAddress = accounts[0];
-            setUserAddress(senderAddress);
-            console.log("✅ User Address:", senderAddress);
-            return senderAddress;
-        } catch (error) {
-            console.error("❌ Error fetching user address:", error);
-        }
-    }
+  return (
+    <Box bg="#000000" minH="100vh" fontFamily="'Inter', sans-serif" pt="72px">
+      <Navbar />
 
-    async function fetchMyClasses() {
-        try {
-            const provider = new ethers.providers.Web3Provider(window.ethereum);
-            let accounts = await provider.send("eth_requestAccounts", []);
-            let senderAddress = accounts[0];
-            const contract = new ethers.Contract(address, abi, provider);
-            const data = await contract.myClasses(senderAddress);
+      <Container maxW="1280px" px={{ base: 5, md: 8 }} py={12}>
+        {/* Header */}
+        <Flex justify="space-between" align="center" mb={10} gap={4} flexWrap="wrap">
+          <Box>
+            <Heading fontSize={{ base: "28px", md: "36px" }} fontWeight="700"
+              letterSpacing="-0.04em" color="#fafafa" mb={1}>My Classes</Heading>
+            <Text color="#71717a" fontSize="14px">Classes you've hosted or enrolled in</Text>
+          </Box>
+          {isConnected && (
+            <HStack spacing={3}>
+              <button className="btn-outline-pill" onClick={fetchMyClasses}
+                disabled={loading} style={{ opacity: loading ? 0.5 : 1 }}>
+                {loading ? "Loading…" : "Refresh"}
+              </button>
+              <button className="btn-primary" onClick={() => router.push("/host-class")}
+                style={{ height: 36, padding: "0 16px", fontSize: 14 }}>
+                + Host Class
+              </button>
+            </HStack>
+          )}
+        </Flex>
 
-            if (!data || data.length === 0) {
-                console.warn("⚠️ No classes found for user.");
-                return;
-            }
+        {/* Not connected */}
+        {!isConnected && (
+          <Box textAlign="center" py={28}>
+            <Text fontSize="40px" mb={6}>🔑</Text>
+            <Heading fontSize="24px" fontWeight="700" letterSpacing="-0.03em" color="#fafafa" mb={3}>
+              Connect your wallet
+            </Heading>
+            <Text color="#71717a" fontSize="15px" mb={8} maxW="400px" mx="auto" lineHeight="1.6">
+              Connect MetaMask to view the classes you've hosted or enrolled in.
+            </Text>
+            <button className="btn-primary" onClick={connect} style={{ height: 44, padding: "0 28px" }}>
+              Connect Wallet
+            </button>
+          </Box>
+        )}
 
-            const itemsFetched = await Promise.all(
-                data.map(async (i) => {
-                    let parseStringFlowRate = ethers.utils.formatEther(i.stringFlowRate);
-                    let item = {
-                        host: i.host.toString(),
-                        title: i.title,
-                        description: i.description,
-                        time: i.time,
-                        meetingId: i.meetingId,
-                        flowRate: i.flowRate.toNumber(),
-                        stringFlowRate: parseStringFlowRate,
-                        gigId: i.gigId.toNumber(),
-                        nftTokenId: i.nftTokenId.toNumber(),
-                        attendees: i.attendees.toNumber(),
-                    };
-                    return item;
-                })
-            );
+        {/* Error */}
+        {isConnected && error && (
+          <Box bg="rgba(239,68,68,0.05)" border="1px solid rgba(239,68,68,0.15)"
+            borderRadius="12px" px={5} py={4} mb={8}>
+            <Flex justify="space-between" align="center">
+              <Text color="#f87171" fontSize="14px">{error}</Text>
+              <button className="btn-outline-pill" onClick={fetchMyClasses}
+                style={{ height: 30, padding: "0 12px", fontSize: 13, borderColor: "rgba(248,113,113,0.3)", color: "#f87171" }}>
+                Retry
+              </button>
+            </Flex>
+          </Box>
+        )}
 
-            console.log("✅ Fetched My Classes:", itemsFetched);
-            setGigs(itemsFetched);
-        } catch (error) {
-            console.error("❌ Error fetching user classes:", error);
-        }
-    }
+        {/* Loading */}
+        {isConnected && loading && (
+          <Grid templateColumns={{ base: "1fr", md: "repeat(2,1fr)", lg: "repeat(3,1fr)" }} gap={5}>
+            {[1,2,3].map(i => <CardSkeleton key={i} />)}
+          </Grid>
+        )}
 
-    function Card(prop) {
-        const add0 = (t) => (t < 10 ? `0${t}` : String(t));
-        const getDateStandard = (dt) => {
-            const y = dt.getFullYear();
-            const m = add0(dt.getMonth() + 1);
-            const d = add0(dt.getDate());
-            const w = dt.toDateString().substring(0, 3);
-            const h = add0(dt.getHours());
-            const min = add0(dt.getMinutes());
-            return `${d}-${m}-${y} ${w} ${h}:${min}`;
-        };
-        const dateTime = new Date(prop.time);
+        {/* Content */}
+        {isConnected && !loading && !error && (
+          <>
+            {classes.length === 0 ? (
+              <Box textAlign="center" py={28}>
+                <Text fontSize="40px" mb={6}>🎒</Text>
+                <Heading fontSize="24px" fontWeight="700" letterSpacing="-0.03em" color="#fafafa" mb={3}>
+                  No classes yet
+                </Heading>
+                <Text color="#71717a" fontSize="15px" mb={8} maxW="400px" mx="auto" lineHeight="1.6">
+                  Browse classes to enroll, or host your own and start earning.
+                </Text>
+                <Flex gap={3} justify="center">
+                  <button className="btn-primary" onClick={() => router.push("/gigs")}
+                    style={{ height: 44, padding: "0 24px" }}>Browse Classes</button>
+                  <button className="btn-outline-pill" onClick={() => router.push("/host-class")}
+                    style={{ height: 44, padding: "0 24px" }}>Host a Class</button>
+                </Flex>
+              </Box>
+            ) : (
+              <>
+                {/* Tab bar */}
+                <Flex gap={2} mb={8} wrap="wrap">
+                  {TABS.map((tab, i) => (
+                    <button key={tab} onClick={() => setActiveTab(i)}
+                      style={{
+                        height: 34, padding: "0 14px", borderRadius: 9999,
+                        fontSize: 13, fontWeight: 500, fontFamily: "'Inter', sans-serif",
+                        cursor: "pointer", transition: "all 0.2s ease",
+                        background: activeTab === i ? "rgba(255,255,255,0.08)" : "transparent",
+                        color: activeTab === i ? "#fafafa" : "#71717a",
+                        border: activeTab === i ? "1px solid rgba(255,255,255,0.16)" : "1px solid rgba(255,255,255,0.06)",
+                      }}>
+                      {tab}
+                      <span style={{
+                        marginLeft: 8, padding: "1px 7px", borderRadius: 9999,
+                        background: "rgba(255,255,255,0.06)", fontSize: 11, color: "#71717a",
+                      }}>{counts[i]}</span>
+                    </button>
+                  ))}
+                </Flex>
 
-        return (
-            <div className={`bg-primary ${styles.flexStart}`}>
-                <div className={`${styles.boxWidth}`}>
-                    <section className={`${styles.flexCenter} ${styles.marginY} !mb-0 ${styles.padding} sm:flex-row flex-col bg-black-gradient-3 rounded-[20px] box-shadow mx-10`}>
-                        <div className="flex-1 flex flex-col w-full">
-                            <div className="flex items-center justify-between w-full">
-                                <div className="grow-[3] max-w-[75%]">
-                                    <h1 className="font-poppins font-semibold ss:text-[40px] text-[32px] text-white ss:leading-[50.8px] leading-[45px] capitalize">
-                                        {prop.title}
-                                    </h1>
-                                    <p className="font-thin text-slate-200 mt-1 leading-5">{prop.description}</p>
-                                    <p className="mt-3 text-gray-500">Date: {getDateStandard(dateTime)}</p>
-                                </div>
-                                <div className="flex flex-1 justify-center items-end flex-col">
-                                    <p className="mr-6">Price: {prop.stringFlowRate} Eth/Hour</p>
-                                    <button
-                                        type="button"
-                                        onClick={() => joinMeeting(prop)}
-                                        className={`py-4 mt-2 px-12 font-poppins font-medium text-[18px] text-primary bg-blue-gradient rounded-[10px] outline-none ${styles}`}
-                                    >
-                                        Launch Meeting
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </section>
-                </div>
-            </div>
-        );
-    }
-
-    return (
-        <div className="bg-primary w-full overflow-hidden min-h-screen">
-            <div className={`${styles.paddingX} ${styles.flexCenter}`}>
-                <div className={`${styles.boxWidth}`}>
-                    <Navbar />
-                </div>
-            </div>
-            <div className={`bg-primary ${styles.flexStart} mt-5 text-center`}>
-                <div className={`${styles.boxWidth}`}>
-                    <h1 className="font-poppins font-semibold ss:text-[72px] text-[52px] text-white ss:leading-[100.8px] leading-[75px]">
-                        My Purchased Classes
-                    </h1>
-                </div>
-            </div>
-            <div>
-                <div className="flex">
-                    <div className="pb-20 flex-1">
-                        {gigs.length > 0 ? (
-                            gigs.map((item, i) => (
-                                <Card
-                                    key={i}
-                                    host={item.host}
-                                    title={item.title}
-                                    description={item.description}
-                                    time={item.time}
-                                    meetingId={item.meetingId}
-                                    flowRate={item.flowRate}
-                                    stringFlowRate={item.stringFlowRate}
-                                    gigId={item.gigId}
-                                />
-                            ))
-                        ) : (
-                            <p className="text-center text-gray-400 mt-10">No purchased classes found.</p>
-                        )}
-                    </div>
-                </div>
-            </div>
-        </div>
-    );
+                {tabItems[activeTab].length === 0 ? (
+                  <Text color="#52525b" textAlign="center" py={12} fontSize="14px">
+                    {activeTab === 1 ? "You haven't hosted any classes yet." : "You haven't enrolled in any classes yet."}
+                  </Text>
+                ) : (
+                  <motion.div initial="hidden" animate="show" variants={stagger}>
+                    <Grid templateColumns={{ base: "1fr", md: "repeat(2,1fr)", lg: "repeat(3,1fr)" }} gap={5}>
+                      {tabItems[activeTab].map(cls => (
+                        <ClassCard key={cls.gigId.toString()} cls={cls} onJoin={joinMeeting} />
+                      ))}
+                    </Grid>
+                  </motion.div>
+                )}
+              </>
+            )}
+          </>
+        )}
+      </Container>
+    </Box>
+  );
 }

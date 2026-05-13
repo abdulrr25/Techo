@@ -1,26 +1,41 @@
-import styles from "../styles/style";
-import { arrowUp } from "../assets";
-import Image from "next/image";
-import { useRouter } from 'next/navigation';
+import {
+  Box,
+  Button,
+  Flex,
+  Text,
+  useColorModeValue,
+} from "@chakra-ui/react";
+import { motion } from "framer-motion";
+
+const MotionBox = motion(Box);
 
 const GetStarted = () => {
-  const router = useRouter();
+  const bgColor = useColorModeValue("white", "gray.800");
+  const textColor = useColorModeValue("gray.800", "white");
+
   return (
-    <div onClick={() => router.push('/gigs')} className={`${styles.flexCenter} w-[140px] h-[140px] rounded-full bg-blue-gradient p-[2px] cursor-pointer`}>
-      <div className={`${styles.flexCenter} flex-col bg-primary w-[100%] h-[100%] rounded-full`}>
-        <div className={`${styles.flexStart} flex-row`}>
-          <p className="font-poppins font-medium text-[18px] leading-[23.4px]">
-            <span className="text-gradient">Get</span>
-          </p>
-          <Image src={arrowUp} alt="arrow-up" className="w-[23px] h-[23px] object-contain" />
-        </div>
-        
-        <p className="font-poppins font-medium text-[18px] leading-[23.4px]">
-          <span className="text-gradient">Started</span>
-        </p>
-      </div>
-    </div>
+    <MotionBox
+      initial={{ opacity: 0, scale: 0.9 }}
+      whileInView={{ opacity: 1, scale: 1 }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.5 }}
+    >
+      <Button
+        colorScheme="blue"
+        size="lg"
+        px={8}
+        py={6}
+        fontSize="md"
+        rounded="full"
+        _hover={{
+          transform: "translateY(-2px)",
+          boxShadow: "lg",
+        }}
+      >
+        Get Started
+      </Button>
+    </MotionBox>
   );
-} 
+};
 
 export default GetStarted;

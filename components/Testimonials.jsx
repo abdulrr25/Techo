@@ -1,27 +1,98 @@
-import { feedback } from "../constants";
-import styles from "../styles/style";
-import FeedbackCard from "./FeedbackCard";
+import {
+  Box,
+  Container,
+  Heading,
+  Text,
+  Flex,
+  Stack,
+  useColorModeValue,
+} from "@chakra-ui/react";
+import { motion } from "framer-motion";
 
-const Testimonials = () => (
-  <section id="clients" className={`${styles.paddingY} ${styles.flexCenter} flex-col relative `}>
-    <div className="absolute z-[0] w-[60%] h-[60%] -right-[50%] rounded-full blue__gradient bottom-40" />
+const MotionBox = motion(Box);
 
-    <div className="w-full flex justify-between items-center md:flex-row flex-col sm:mb-16 mb-6 relative z-[1]">
-      <h2 className={styles.heading2}>
-        What People are <br className="sm:block hidden" /> saying about us
-      </h2>
-      <div className="w-full md:mt-0 mt-6">
-        <p className={`${styles.paragraph} text-left max-w-[450px]`}>
-          Everything you need to accept card payments and grow your business
-          anywhere on the planet.
-        </p>
-      </div>
-    </div>
+const Testimonials = () => {
+  const bgColor = useColorModeValue("white", "gray.800");
+  const textColor = useColorModeValue("gray.800", "white");
 
-    <div className="flex flex-wrap sm:justify-start justify-center w-full feedback-container relative z-[1]">
-      {feedback.map((card) => <FeedbackCard key={card.id} {...card} />)}
-    </div>
-  </section>
-);
+  return (
+    <Box as="section" py={20} bg={bgColor}>
+      <Container maxW="container.xl">
+        <Stack spacing={8} align="center" textAlign="center">
+          <MotionBox
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5 }}
+          >
+            <Heading
+              as="h2"
+              size="2xl"
+              mb={6}
+              color={textColor}
+              fontWeight="bold"
+            >
+              What people are saying about us
+            </Heading>
+            <Text fontSize="lg" color="gray.600" maxW="2xl">
+              Hear from our satisfied users about their experience with our platform.
+            </Text>
+          </MotionBox>
+          <Flex
+            direction={{ base: "column", md: "row" }}
+            gap={8}
+            justify="center"
+            align="stretch"
+          >
+            {[
+              {
+                name: "John Doe",
+                role: "Student",
+                text: "This platform has transformed my learning experience. The quality of education is outstanding!",
+              },
+              {
+                name: "Jane Smith",
+                role: "Teacher",
+                text: "As an educator, I find this platform incredibly intuitive and effective for teaching.",
+              },
+              {
+                name: "Mike Johnson",
+                role: "Parent",
+                text: "My child's academic performance has improved significantly since using this platform.",
+              },
+            ].map((testimonial, index) => (
+              <MotionBox
+                key={index}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: index * 0.2 }}
+                flex={1}
+                maxW="md"
+              >
+                <Box
+                  p={6}
+                  bg="white"
+                  rounded="lg"
+                  shadow="lg"
+                  borderWidth={1}
+                  borderColor="gray.200"
+                >
+                  <Text fontSize="lg" color="gray.600" mb={4}>
+                    "{testimonial.text}"
+                  </Text>
+                  <Text fontWeight="bold" color="gray.800">
+                    {testimonial.name}
+                  </Text>
+                  <Text color="gray.600">{testimonial.role}</Text>
+                </Box>
+              </MotionBox>
+            ))}
+          </Flex>
+        </Stack>
+      </Container>
+    </Box>
+  );
+};
 
 export default Testimonials;

@@ -1,54 +1,124 @@
-import { apple, bill, google } from "../assets";
-import styles, { layout } from "../styles/style";
-import Image from "next/image";
+import {
+  Box,
+  Container,
+  Heading,
+  Text,
+  Image,
+  Flex,
+  Stack,
+  useColorModeValue,
+} from "@chakra-ui/react";
+import { motion } from "framer-motion";
 
-const Billing = () => (
-  <section id="product" className={layout.sectionReverse}>
-    <div className={layout.sectionImgReverse}>
-      <Image 
-        src={bill} 
-        alt="Billing interface preview" 
-        width={500} 
-        height={500} 
-        className="w-full h-full relative z-[5]" 
-        priority 
-      />
+const MotionBox = motion(Box);
 
-      {/* Gradient Effects */}
-      <div className="absolute z-[3] -left-1/2 top-0 w-1/2 h-1/2 rounded-full white__gradient" />
-      <div className="absolute z-[0] w-1/2 h-1/2 -left-1/2 bottom-0 rounded-full pink__gradient" />
-    </div>
+const Billing = () => {
+  const bgColor = useColorModeValue("white", "gray.800");
+  const textColor = useColorModeValue("gray.800", "white");
 
-    <div className={layout.sectionInfo}>
-      <h2 className={styles.heading2}>
-        Easily control your <br className="sm:block hidden" /> billing & invoicing
-      </h2>
-      <p className={`${styles.paragraph} max-w-[470px] mt-5`}>
-        Manage all your transactions in one place with ease. Track payments, 
-        automate invoices, and stay organized effortlessly. Our intuitive 
-        interface ensures smooth financial management without the hassle.
-      </p>
-
-      <div className="flex flex-row flex-wrap sm:mt-10 mt-6">
-        <Image 
-          src={apple} 
-          alt="Download on the App Store" 
-          width={129} 
-          height={42} 
-          className="object-contain mr-5 cursor-pointer" 
-          loading="lazy" 
-        />
-        <Image 
-          src={google} 
-          alt="Get it on Google Play" 
-          width={144} 
-          height={43} 
-          className="object-contain cursor-pointer" 
-          loading="lazy" 
-        />
-      </div>
-    </div>
-  </section>
-);
+  return (
+    <Box as="section" py={20} bg={bgColor}>
+      <Container maxW="container.xl">
+        <Flex
+          direction={{ base: "column", md: "row" }}
+          align="center"
+          justify="space-between"
+          gap={8}
+        >
+          <Box flex={1}>
+            <MotionBox
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5 }}
+            >
+              <Heading
+                as="h2"
+                size="2xl"
+                mb={6}
+                color={textColor}
+                fontWeight="bold"
+              >
+                Easily control your billing & invoicing.
+              </Heading>
+              <Text fontSize="lg" color="gray.600" mb={8}>
+                Elit enim sed massa etiam. Mauris eu adipiscing ultrices ametodio
+                aenean neque. Fusce ipsum orci rhoncus aliporttitor integer platea
+                placerat.
+              </Text>
+              <Stack spacing={4}>
+                <Flex align="center" gap={4}>
+                  <Box
+                    w={8}
+                    h={8}
+                    bg="blue.500"
+                    rounded="full"
+                    display="flex"
+                    alignItems="center"
+                    justifyContent="center"
+                  >
+                    <Text color="white" fontWeight="bold">
+                      ✓
+                    </Text>
+                  </Box>
+                  <Text>Flexible payment options</Text>
+                </Flex>
+                <Flex align="center" gap={4}>
+                  <Box
+                    w={8}
+                    h={8}
+                    bg="blue.500"
+                    rounded="full"
+                    display="flex"
+                    alignItems="center"
+                    justifyContent="center"
+                  >
+                    <Text color="white" fontWeight="bold">
+                      ✓
+                    </Text>
+                  </Box>
+                  <Text>Automatic invoice generation</Text>
+                </Flex>
+                <Flex align="center" gap={4}>
+                  <Box
+                    w={8}
+                    h={8}
+                    bg="blue.500"
+                    rounded="full"
+                    display="flex"
+                    alignItems="center"
+                    justifyContent="center"
+                  >
+                    <Text color="white" fontWeight="bold">
+                      ✓
+                    </Text>
+                  </Box>
+                  <Text>Real-time payment tracking</Text>
+                </Flex>
+              </Stack>
+            </MotionBox>
+          </Box>
+          <Box flex={1}>
+            <MotionBox
+              initial={{ opacity: 0, scale: 0.9 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5 }}
+            >
+              <Image
+                src="/assets/bill.png"
+                alt="Billing illustration"
+                w="full"
+                h="auto"
+                rounded="lg"
+                shadow="xl"
+              />
+            </MotionBox>
+          </Box>
+        </Flex>
+      </Container>
+    </Box>
+  );
+};
 
 export default Billing;

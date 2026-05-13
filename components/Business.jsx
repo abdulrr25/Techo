@@ -1,48 +1,104 @@
 import { features } from "../constants";
-import styles, { layout } from "../styles/style";
-import Button from "./Button";
-import Image from "next/image";
+import {
+  Box,
+  Container,
+  Flex,
+  Heading,
+  Text,
+  Image,
+  Button,
+  useColorModeValue,
+} from "@chakra-ui/react";
 
-const FeatureCard = ({ icon, title, content, index }) => (
-  <div className={`flex flex-row p-6 rounded-[20px] ${index !== features.length - 1 ? "mb-6" : "mb-0"} feature-card`}>
-    <div className={`w-[64px] h-[64px] rounded-full ${styles.flexCenter} bg-dimBlue`}>
-      <Image src={icon} alt="star" className="w-[50%] h-[50%] object-contain" />
-    </div>
-    <div className="flex-1 flex flex-col ml-3">
-      <h4 className="font-poppins font-semibold text-white text-[18px] leading-[23.4px] mb-1">
-        {title}
-      </h4>
-      <p className="font-poppins font-normal text-dimWhite text-[16px] leading-[24px]">
-        {content}
-      </p>
-    </div>
-  </div>
-);
+const Business = () => {
+  const bgColor = useColorModeValue("white", "gray.800");
+  const textColor = useColorModeValue("gray.800", "white");
+  const buttonBg = useColorModeValue("blue.500", "blue.400");
+  const buttonHoverBg = useColorModeValue("blue.600", "blue.500");
 
-const Business = () => (
-  <section id="features" className={layout.section}>
-    <div className={layout.sectionInfo}>
-      <h2 className={styles.heading2}>
-        Tired of the lack of trust <br className="sm:block hidden" /> in online
-        courses?
-      </h2>
-      <p className={`${styles.paragraph} max-w-[470px] mt-5`}>
-        We are revolutionizing online education with our pay-per-second feature. 
-        Students&apos; account balances are deducted only for the time they actively participate in the meeting.
-        As soon as they leave, the deductions stop, ensuring a secure and
-        transparent payment system that guarantees both student satisfaction and
-        peace of mind.
-      </p>
+  return (
+    <Box bg={bgColor} py={20}>
+      <Container maxW="container.xl">
+        <Flex
+          direction={{ base: "column", md: "row" }}
+          align="center"
+          justify="space-between"
+          gap={8}
+        >
+          <Box flex="1" maxW={{ base: "100%", md: "50%" }}>
+            <Heading
+              as="h2"
+              size="2xl"
+              color={textColor}
+              mb={4}
+              fontWeight="bold"
+              lineHeight="1.2"
+            >
+              You do the business, we'll handle the money.
+            </Heading>
+            <Text fontSize="lg" color={textColor} opacity={0.9} mb={8}>
+              With the right credit card, you can improve your financial life by
+              building credit, earning rewards and saving money. But with hundreds
+              of credit cards on the market.
+            </Text>
+            <Button
+              bg={buttonBg}
+              color="white"
+              size="lg"
+              _hover={{ bg: buttonHoverBg }}
+              _active={{ bg: buttonHoverBg }}
+            >
+              Get Started
+            </Button>
+          </Box>
 
-      <Button styles={`mt-10`} />
-    </div>
-
-    <div className={`${layout.sectionImg} flex-col`}>
-      {features.map((feature, index) => (
-        <FeatureCard key={feature.id} {...feature} index={index} />
-      ))}
-    </div>
-  </section>
-);
+          <Box flex="1" maxW={{ base: "100%", md: "50%" }}>
+            <Flex direction="column" gap={6}>
+              {features.map((feature, index) => (
+                <Flex
+                  key={feature.id}
+                  align="center"
+                  gap={4}
+                  p={4}
+                  borderRadius="lg"
+                  bg={useColorModeValue("gray.50", "gray.700")}
+                  _hover={{
+                    transform: "translateY(-2px)",
+                    transition: "all 0.2s",
+                  }}
+                >
+                  <Box
+                    w={12}
+                    h={12}
+                    borderRadius="full"
+                    bg={useColorModeValue("blue.100", "blue.900")}
+                    display="flex"
+                    alignItems="center"
+                    justifyContent="center"
+                  >
+                    <Image
+                      src={feature.icon}
+                      alt={feature.title}
+                      w={6}
+                      h={6}
+                    />
+                  </Box>
+                  <Box>
+                    <Heading as="h3" size="md" color={textColor} mb={2}>
+                      {feature.title}
+                    </Heading>
+                    <Text color={textColor} opacity={0.9}>
+                      {feature.content}
+                    </Text>
+                  </Box>
+                </Flex>
+              ))}
+            </Flex>
+          </Box>
+        </Flex>
+      </Container>
+    </Box>
+  );
+};
 
 export default Business;
