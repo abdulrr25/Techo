@@ -8,7 +8,7 @@
 
 <br /><br />
 
-# **Teacho** — Learn Anything. Pay Per Second.
+# **Techo** — Learn Anything. Pay Per Second.
 
 **The first decentralized education platform where ETHx streams directly  
 from student to teacher in real-time — pay only for the exact seconds you learn.**
@@ -23,9 +23,9 @@ from student to teacher in real-time — pay only for the exact seconds you lear
 
 ---
 
-## ✨ What is Teacho?
+## ✨ What is Techo?
 
-Teacho reimagines online education with a trustless, pay-as-you-go model. Traditional platforms charge upfront — students pay even if a class is terrible. Teacho fixes that:
+Techo reimagines online education with a trustless, pay-as-you-go model. Traditional platforms charge upfront — students pay even if a class is terrible. Techo fixes that:
 
 > Students pay **10% upfront** as a commitment deposit. The remaining **90% streams per second** via Superfluid directly to the teacher's wallet. Leave any time — the stream stops instantly, and you're only charged for time actually spent learning.
 
@@ -50,13 +50,13 @@ No platform cut. No intermediaries. Fully on-chain.
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│                         TEACHO PLATFORM                         │
+│                         Techo PLATFORM                         │
 ├────────────────────┬────────────────────┬───────────────────────┤
 │   FRONTEND         │   SMART CONTRACT   │   MEDIA LAYER         │
 │   Next.js 14       │   Base Sepolia     │   Huddle01            │
 │   Chakra UI        │                   │                       │
 │   Framer Motion    │  ┌─────────────┐  │  ┌─────────────────┐  │
-│   wagmi v2         │  │ TeachoGig   │  │  │  Room Creation  │  │
+│   wagmi v2         │  │ TechoGig   │  │  │  Room Creation  │  │
 │                    │  │  createGig  │  │  │  AccessToken    │  │
 │  ┌──────────────┐  │  │  buyGig     │  │  │  WebRTC Peers   │  │
 │  │  useWeb3.js  │  │  │  myClasses  │  │  └─────────────────┘  │
@@ -222,7 +222,7 @@ Or wrap manually at [app.superfluid.finance](https://app.superfluid.finance) on 
 ## 📁 Project Structure
 
 ```
-teacho/
+Techo/
 ├── pages/
 │   ├── index.js              # Landing page
 │   ├── gigs.js               # Browse all live classes
@@ -237,7 +237,7 @@ teacho/
 │   ├── useWeb3.js            # wagmi wallet hook
 │   └── useStream.js          # Superfluid stream lifecycle
 ├── constants/
-│   ├── abi.js                # Teacho contract ABI
+│   ├── abi.js                # Techo contract ABI
 │   └── superfluidAbi.js      # CFAv1Forwarder + ETHx ABIs
 ├── components/
 │   └── Navbar.jsx            # Navigation bar
@@ -259,7 +259,7 @@ teacho/
 
 ## 🌊 Superfluid Integration
 
-Teacho uses the **CFAv1Forwarder** contract at `0xcfA132E353cB4E398080B9700609bb008eceB125` (same address on all networks).
+Techo uses the **CFAv1Forwarder** contract at `0xcfA132E353cB4E398080B9700609bb008eceB125` (same address on all networks).
 
 ```javascript
 // Start streaming when student joins
@@ -309,7 +309,7 @@ const token = await new AccessToken({
 
 ## 🎨 Design System
 
-Teacho uses a **Morphic-inspired** dark design system:
+Techo uses a **Morphic-inspired** dark design system:
 
 | Token | Value |
 |---|---|
@@ -396,6 +396,6 @@ MIT — see [LICENSE](LICENSE) for details.
 
 [Browse Classes](https://github.com/abdulrr25/techo) · [Host a Class](https://github.com/abdulrr25/techo) · [Smart Contract](https://sepolia.basescan.org/address/0xF8E9F063228eb47137101eb863BF3976466AA31F)
 
-<sub>Teacho is a testnet project. All transactions use Base Sepolia testnet ETH — no real monetary value.</sub>
+<sub>Techo is a testnet project. All transactions use Base Sepolia testnet ETH — no real monetary value.</sub>
 
 </div>
