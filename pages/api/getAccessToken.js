@@ -1,34 +1,32 @@
 import { AccessToken, Role } from "@huddle01/server-sdk/auth";
 
 export default async function handler(req, res) {
+  if (req.method !== "GET" && req.method !== "POST") {
+    return res.status(405).json({ error: "Method not allowed" });
+  }
+
   try {
-    const { roomId } = req.query;
+    const roomId = req.method === "GET" ? req.query.roomId : req.body?.roomId;
 
     if (!roomId) {
-      console.error("❌ Error: roomId is missing in request.");
-      return res.status(400).json({ error: "roomId is required" });
+      return res.status(400).json({ error: "Room ID is required" });
     }
 
-    if (!process.env.NEXT_PUBLIC_HUDDLE_API_KEY) {
-      console.error("❌ Error: Huddle API key is missing.");
-      return res.status(500).json({ error: "API Key is missing" });
+    const apiKey = process.env.HUDDLE_API_KEY || process.env.NEXT_PUBLIC_HUDDLE_API_KEY;
+    if (!apiKey) {
+      return res.status(500).json({ error: "HUDDLE_API_KEY not configured" });
     }
 
-    // console.log("🔹 Generating token for room:", roomId);
-
+    // Generate JWT locally using the server SDK — no HTTP call needed
     const accessToken = new AccessToken({
-      apiKey: process.env.NEXT_PUBLIC_HUDDLE_API_KEY,
+      apiKey,
       roomId,
       role: Role.HOST,
       permissions: {
         admin: true,
         canConsume: true,
         canProduce: true,
-        canProduceSources: {
-          cam: true,
-          mic: true,
-          screen: true,
-        },
+        canProduceSources: { cam: true, mic: true, screen: true },
         canRecvData: true,
         canSendData: true,
         canUpdateMetadata: true,
@@ -36,16 +34,15 @@ export default async function handler(req, res) {
     });
 
     const token = await accessToken.toJwt();
-
+    // toJwt() returns undefined for 422 (room not associated with this API key)
     if (!token) {
-      console.error("❌ Error: Failed to generate token.");
-      return res.status(500).json({ error: "Failed to generate token" });
+      return res.status(422).json({
+        error: "Room not associated with this API key. Only rooms created via this app are joinable.",
+      });
     }
-
-    // console.log("✅ Token Generated Successfully:", token);
     return res.status(200).json({ token });
   } catch (error) {
-    console.error("❌ Error generating access token:", error);
-    return res.status(500).json({ error: "Internal Server Error" });
+    console.error("Error generating access token:", error);
+    return res.status(500).json({ error: "Failed to generate token", details: error.message });
   }
 }

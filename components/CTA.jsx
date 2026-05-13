@@ -1,19 +1,64 @@
-import styles from "../styles/style";
-import Button from "./Button";
+import {
+  Box,
+  Container,
+  Flex,
+  Heading,
+  Text,
+  Button,
+  useColorModeValue,
+} from "@chakra-ui/react";
 
-const CTA = () => (
-  <section className={`${styles.flexCenter} ${styles.marginY} ${styles.padding} sm:flex-row flex-col bg-black-gradient-2 rounded-[20px] box-shadow`}>
-    <div className="flex-1 flex flex-col">
-      <h2 className={styles.heading2}>Let’s try our service now!</h2>
-      <p className={`${styles.paragraph} max-w-[470px] mt-5`}>
-        Everything you need to host lecture or attend lecture from anywhere in the world. 
-      </p>
-    </div>
+const CTA = () => {
+  const bgColor = useColorModeValue("blue.500", "blue.600");
+  const textColor = "white";
+  const buttonBg = useColorModeValue("white", "gray.100");
+  const buttonHoverBg = useColorModeValue("gray.100", "white");
 
-    <div className={`${styles.flexCenter} sm:ml-10 ml-0 sm:mt-0 mt-10`}>
-      <Button />
-    </div>
-  </section>
-);
+  return (
+    <Box bg={bgColor} py={20}>
+      <Container maxW="container.xl">
+        <Flex
+          direction={{ base: "column", md: "row" }}
+          align="center"
+          justify="space-between"
+          gap={8}
+        >
+          <Box flex="1" maxW={{ base: "100%", md: "60%" }}>
+            <Heading
+              as="h2"
+              size="2xl"
+              color={textColor}
+              mb={4}
+              fontWeight="bold"
+              lineHeight="1.2"
+            >
+              Let's try our service now!
+            </Heading>
+            <Text fontSize="lg" color={textColor} opacity={0.9}>
+              Everything you need to accept card payments and grow your business
+              anywhere on the planet.
+            </Text>
+          </Box>
+
+          <Box>
+            <Button
+              bg={buttonBg}
+              color={bgColor}
+              size="lg"
+              px={8}
+              py={6}
+              fontSize="lg"
+              fontWeight="bold"
+              _hover={{ bg: buttonHoverBg }}
+              _active={{ bg: buttonHoverBg }}
+            >
+              Get Started
+            </Button>
+          </Box>
+        </Flex>
+      </Container>
+    </Box>
+  );
+};
 
 export default CTA;
