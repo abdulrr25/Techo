@@ -153,7 +153,8 @@ function StreamBar({ stream, onWrap }) {
             </span>
           </span>
         )}
-        {!hasBalance && !isStreaming && (
+        {/* Only show wrap button once balance is fetched and is actually zero */}
+        {ethxBalance !== null && !hasBalance && !isStreaming && (
           <button
             onClick={onWrap}
             className="text-xs bg-cyan-600 hover:bg-cyan-500 text-white px-3 py-1 rounded-lg transition"
@@ -407,31 +408,33 @@ function RoomContent({ roomId, hostAddress, flowRate }) {
   }, [roomId]);
 
   // ── Step 2: Once connected, start Superfluid stream (students only) ─────────
+  // createStream() internally calls getFlowrate first — if a stream already
+  // exists (e.g. student rejoined) it sets status → "streaming" without
+  // sending a new tx. Never skip it with an early return, or the StreamBar
+  // stays "idle" and handleLeave won't call deleteStream on exit.
   useEffect(() => {
     if (state !== "connected" || isHost || !account || !hostAddress || !flowRate) return;
 
     (async () => {
       try {
-        // Check ETHx balance first
+        // Fetch ETHx balance so StreamBar shows correct balance immediately
         await stream.refreshBalance();
-        const bal = await stream.checkExistingStream();
 
-        if (bal && bal > 0n) {
-          // Stream already exists (e.g. rejoining)
-          return;
-        }
-
-        // Small delay to let the room settle
+        // Small delay to let the room settle before opening transport
         await new Promise((r) => setTimeout(r, 1500));
+
+        const wasAlreadyStreaming = stream.status === "streaming";
         await stream.createStream();
 
-        toast({
-          title: "Payment stream started",
-          description: "ETHx is flowing to the teacher per second.",
-          status: "success",
-          duration: 5000,
-          isClosable: true,
-        });
+        if (!wasAlreadyStreaming) {
+          toast({
+            title: "Payment stream started",
+            description: "ETHx is flowing to the teacher per second.",
+            status: "success",
+            duration: 5000,
+            isClosable: true,
+          });
+        }
       } catch (err) {
         if (err?.message?.includes("insufficient") || err?.message?.includes("balance")) {
           setShowWrapModal(true);
@@ -446,7 +449,7 @@ function RoomContent({ roomId, hostAddress, flowRate }) {
         }
       }
     })();
-  }, [state, isHost, account, hostAddress]);
+  }, [state, isHost, account, hostAddress, flowRate]);
 
   // ── Leave: stop stream then leave room ────────────────────────────────────
   const handleLeave = useCallback(async () => {
