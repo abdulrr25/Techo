@@ -79,7 +79,7 @@ const Testimonials = () => {
                   borderColor="gray.200"
                 >
                   <Text fontSize="lg" color="gray.600" mb={4}>
-                    "{testimonial.text}"
+                    &quot;{testimonial.text}&quot;
                   </Text>
                   <Text fontWeight="bold" color="gray.800">
                     {testimonial.name}

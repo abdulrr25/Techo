@@ -32,7 +32,7 @@ const CTA = () => {
               fontWeight="bold"
               lineHeight="1.2"
             >
-              Let's try our service now!
+              Let&apos;s try our service now!
             </Heading>
             <Text fontSize="lg" color={textColor} opacity={0.9}>
               Everything you need to accept card payments and grow your business

@@ -15,7 +15,7 @@ export default async function handler(req, res) {
       return res.status(500).json({ error: "Huddle API key not configured" });
     }
 
-    const response = await fetch(`https://api.huddle01.com/api/v1/room-status/${roomId}`, {
+    const response = await fetch(`https://api.huddle01.com/api/v2/sdk/rooms/${roomId}`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -23,7 +23,14 @@ export default async function handler(req, res) {
       },
     });
 
-    const data = await response.json();
+    // Parse body safely — Huddle can return HTML on 404s
+    const text = await response.text();
+    let data;
+    try {
+      data = JSON.parse(text);
+    } catch {
+      data = { message: text.slice(0, 200) };
+    }
 
     if (!response.ok) {
       console.error("Huddle API error:", data);

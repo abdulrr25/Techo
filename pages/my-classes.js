@@ -130,7 +130,7 @@ export default function MyClasses() {
           <Box>
             <Heading fontSize={{ base: "28px", md: "36px" }} fontWeight="700"
               letterSpacing="-0.04em" color="#fafafa" mb={1}>My Classes</Heading>
-            <Text color="#71717a" fontSize="14px">Classes you've hosted or enrolled in</Text>
+            <Text color="#71717a" fontSize="14px">Classes you&apos;ve hosted or enrolled in</Text>
           </Box>
           {isConnected && (
             <HStack spacing={3}>
@@ -154,7 +154,7 @@ export default function MyClasses() {
               Connect your wallet
             </Heading>
             <Text color="#71717a" fontSize="15px" mb={8} maxW="400px" mx="auto" lineHeight="1.6">
-              Connect MetaMask to view the classes you've hosted or enrolled in.
+              Connect MetaMask to view the classes you&apos;ve hosted or enrolled in.
             </Text>
             <button className="btn-primary" onClick={connect} style={{ height: 44, padding: "0 28px" }}>
               Connect Wallet

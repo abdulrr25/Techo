@@ -35,7 +35,7 @@ const Stats = () => {
               Our Impact in Numbers
             </Heading>
             <Text fontSize="lg" color="gray.600" maxW="2xl">
-              See how we're making a difference in education
+              See how we&apos;re making a difference in education
             </Text>
           </MotionBox>
           <Flex

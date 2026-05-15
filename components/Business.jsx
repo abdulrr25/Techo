@@ -15,6 +15,9 @@ const Business = () => {
   const textColor = useColorModeValue("gray.800", "white");
   const buttonBg = useColorModeValue("blue.500", "blue.400");
   const buttonHoverBg = useColorModeValue("blue.600", "blue.500");
+  // Must be declared here — hooks cannot be called inside .map() callbacks
+  const featureBg = useColorModeValue("gray.50", "gray.700");
+  const iconBg = useColorModeValue("blue.100", "blue.900");
 
   return (
     <Box bg={bgColor} py={20}>
@@ -34,7 +37,7 @@ const Business = () => {
               fontWeight="bold"
               lineHeight="1.2"
             >
-              You do the business, we'll handle the money.
+              You do the business, we&apos;ll handle the money.
             </Heading>
             <Text fontSize="lg" color={textColor} opacity={0.9} mb={8}>
               With the right credit card, you can improve your financial life by
@@ -61,7 +64,7 @@ const Business = () => {
                   gap={4}
                   p={4}
                   borderRadius="lg"
-                  bg={useColorModeValue("gray.50", "gray.700")}
+                  bg={featureBg}
                   _hover={{
                     transform: "translateY(-2px)",
                     transition: "all 0.2s",
@@ -71,7 +74,7 @@ const Business = () => {
                     w={12}
                     h={12}
                     borderRadius="full"
-                    bg={useColorModeValue("blue.100", "blue.900")}
+                    bg={iconBg}
                     display="flex"
                     alignItems="center"
                     justifyContent="center"
