@@ -61,9 +61,9 @@ export const useWeb3 = () => {
     login();
   };
 
-  const disconnectWallet = () => {
-    privyLogout();        // Clears Privy session
-    wagmiDisconnect();    // Also clears wagmi connector state
+  const disconnectWallet = async () => {
+    try { await privyLogout(); } catch { /* ignore logout errors */ }
+    wagmiDisconnect();    // Clears wagmi connector state
     setContract(null);
     toast({
       title: "Wallet Disconnected",

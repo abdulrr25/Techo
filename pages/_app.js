@@ -180,7 +180,10 @@ function MyApp({ Component, pageProps }) {
       >
         <QueryClientProvider client={queryClient}>
           <WagmiProvider config={wagmiConfig}>
-            <ChakraProvider theme={theme}>
+            <ChakraProvider
+              theme={theme}
+              toastOptions={{ defaultOptions: { position: "top-right", duration: 5000 } }}
+            >
               <Component {...pageProps} />
             </ChakraProvider>
           </WagmiProvider>

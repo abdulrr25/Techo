@@ -34,19 +34,32 @@ function RemotePeer({ peerId }) {
   const { stream: audioStream } = useRemoteAudio({ peerId });
 
   return (
-    <div className="relative rounded-2xl overflow-hidden bg-gray-800 border border-gray-700 flex items-center justify-center min-h-[200px]">
+    <div style={{
+      position: "relative", borderRadius: 16, overflow: "hidden",
+      background: "#0a0a0a", border: "1px solid rgba(255,255,255,0.08)",
+      display: "flex", alignItems: "center", justifyContent: "center", minHeight: 200,
+    }}>
       {audioStream && <Audio stream={audioStream} />}
       {videoStream ? (
-        <Video stream={videoStream} className="w-full h-full object-cover" />
+        <Video stream={videoStream} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
       ) : (
-        <div className="flex flex-col items-center gap-3 py-10">
-          <div className="bg-gray-700 rounded-full p-6">
-            <Users size={36} className="text-gray-400" />
+        <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 12, padding: "40px 0" }}>
+          <div style={{
+            background: "rgba(255,255,255,0.04)", borderRadius: "50%", padding: 24,
+            border: "1px solid rgba(255,255,255,0.08)",
+          }}>
+            <Users size={32} color="#3f3f46" />
           </div>
-          <span className="text-gray-400 text-sm">Camera off</span>
+          <span style={{ color: "#52525b", fontSize: 13, fontFamily: "'Inter', sans-serif" }}>Camera off</span>
         </div>
       )}
-      <div className="absolute bottom-3 left-3 bg-black/60 text-white text-xs px-2 py-1 rounded-lg">
+      <div style={{
+        position: "absolute", bottom: 10, left: 10,
+        background: "rgba(0,0,0,0.75)", backdropFilter: "blur(8px)",
+        color: "#a1a1aa", fontSize: 11, padding: "3px 10px", borderRadius: 9999,
+        fontFamily: "'JetBrains Mono', monospace",
+        border: "1px solid rgba(255,255,255,0.08)",
+      }}>
         {peerId.slice(0, 8)}…
       </div>
     </div>
@@ -57,18 +70,31 @@ function RemotePeer({ peerId }) {
 function LocalTile({ isHost }) {
   const { stream } = useLocalVideo();
   return (
-    <div className="relative rounded-2xl overflow-hidden bg-gray-800 border border-gray-700 flex items-center justify-center min-h-[200px]">
+    <div style={{
+      position: "relative", borderRadius: 16, overflow: "hidden",
+      background: "#0a0a0a", border: "1px solid rgba(255,255,255,0.08)",
+      display: "flex", alignItems: "center", justifyContent: "center", minHeight: 200,
+    }}>
       {stream ? (
-        <Video stream={stream} className="w-full h-full object-cover" />
+        <Video stream={stream} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
       ) : (
-        <div className="flex flex-col items-center gap-3 py-10">
-          <div className="bg-gray-700 rounded-full p-6">
-            <Users size={36} className="text-gray-400" />
+        <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 12, padding: "40px 0" }}>
+          <div style={{
+            background: "rgba(255,255,255,0.04)", borderRadius: "50%", padding: 24,
+            border: "1px solid rgba(255,255,255,0.08)",
+          }}>
+            <Users size={32} color="#3f3f46" />
           </div>
-          <span className="text-gray-400 text-sm">Camera off</span>
+          <span style={{ color: "#52525b", fontSize: 13, fontFamily: "'Inter', sans-serif" }}>Camera off</span>
         </div>
       )}
-      <div className="absolute bottom-3 left-3 bg-black/60 text-white text-xs px-2 py-1 rounded-lg">
+      <div style={{
+        position: "absolute", bottom: 10, left: 10,
+        background: "rgba(0,0,0,0.75)", backdropFilter: "blur(8px)",
+        color: "#a1a1aa", fontSize: 11, padding: "3px 10px", borderRadius: 9999,
+        fontFamily: "'JetBrains Mono', monospace",
+        border: "1px solid rgba(255,255,255,0.08)",
+      }}>
         You {isHost ? "(Host)" : "(Student)"}
       </div>
     </div>
@@ -80,9 +106,12 @@ function PeersGrid() {
   const { peerIds } = usePeerIds({ roles: [Role.HOST, Role.CO_HOST, Role.GUEST] });
   if (peerIds.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center h-48 text-gray-500 gap-2">
-        <Users size={32} />
-        <p className="text-sm">Waiting for others to join…</p>
+      <div style={{
+        display: "flex", flexDirection: "column", alignItems: "center",
+        justifyContent: "center", height: 192, gap: 10, color: "#3f3f46",
+      }}>
+        <Users size={28} />
+        <p style={{ fontSize: 13, fontFamily: "'Inter', sans-serif" }}>Waiting for others to join…</p>
       </div>
     );
   }
@@ -103,61 +132,82 @@ function StreamBar({ stream, onWrap }) {
   const hasBalance = ethxBalance != null && ethxBalance > 0n;
 
   return (
-    <div className="bg-gray-900 border-t border-gray-700 px-4 py-2 flex items-center justify-between flex-wrap gap-2 text-xs">
+    <div style={{
+      background: "#0a0a0a", borderTop: "1px solid rgba(255,255,255,0.06)",
+      padding: "8px 16px", display: "flex", alignItems: "center",
+      justifyContent: "space-between", flexWrap: "wrap", gap: 8, fontSize: 12,
+    }}>
       {/* Stream status */}
-      <div className="flex items-center gap-2">
+      <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
         {isStreaming ? (
           <>
-            <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
-            <span className="text-green-400 font-semibold">Stream Active</span>
+            <span style={{ width: 7, height: 7, background: "#22c55e", borderRadius: "50%", display: "inline-block", animation: "pulseGlow 2s ease-in-out infinite" }} />
+            <span style={{ color: "#22c55e", fontWeight: 600, fontFamily: "'Inter', sans-serif" }}>Stream Active</span>
           </>
         ) : isLoading ? (
           <>
             <Spinner size="xs" color="yellow.400" />
-            <span className="text-yellow-400 capitalize">{status}…</span>
+            <span style={{ color: "#eab308", textTransform: "capitalize", fontFamily: "'Inter', sans-serif" }}>{status}…</span>
           </>
         ) : status === "error" ? (
           <>
-            <WifiOff size={12} className="text-red-400" />
-            <span className="text-red-400">Stream error</span>
+            <WifiOff size={12} color="#f87171" />
+            <span style={{ color: "#f87171", fontFamily: "'Inter', sans-serif" }}>Stream error</span>
           </>
         ) : (
           <>
-            <Wifi size={12} className="text-gray-500" />
-            <span className="text-gray-500 capitalize">{status}</span>
+            <Wifi size={12} color="#3f3f46" />
+            <span style={{ color: "#3f3f46", textTransform: "capitalize", fontFamily: "'Inter', sans-serif" }}>{status}</span>
           </>
         )}
       </div>
 
       {/* Live meter */}
       {isStreaming && (
-        <div className="flex items-center gap-4">
-          <span className="text-gray-400">
-            Rate: <span className="text-white font-mono">{parseFloat(ratePerSecond).toFixed(8)} ETHx/s</span>
+        <div style={{ display: "flex", alignItems: "center", gap: 20 }}>
+          <span style={{ color: "#71717a", fontFamily: "'Inter', sans-serif" }}>
+            Rate:{" "}
+            <span style={{ color: "#fafafa", fontFamily: "'JetBrains Mono', monospace" }}>
+              {parseFloat(ratePerSecond).toFixed(8)} ETHx/s
+            </span>
           </span>
-          <span className="text-gray-400">
-            Streamed: <span className="text-cyan-400 font-mono">{parseFloat(amountStreamed).toFixed(8)} ETHx</span>
+          <span style={{ color: "#71717a", fontFamily: "'Inter', sans-serif" }}>
+            Streamed:{" "}
+            <span style={{ color: "#60a5fa", fontFamily: "'JetBrains Mono', monospace" }}>
+              {parseFloat(amountStreamed).toFixed(8)} ETHx
+            </span>
           </span>
-          <span className="text-gray-400">
-            Time: <span className="text-white font-mono">{elapsed}s</span>
+          <span style={{ color: "#71717a", fontFamily: "'Inter', sans-serif" }}>
+            Time:{" "}
+            <span style={{ color: "#fafafa", fontFamily: "'JetBrains Mono', monospace" }}>{elapsed}s</span>
           </span>
         </div>
       )}
 
       {/* ETHx balance + wrap button */}
-      <div className="flex items-center gap-3">
+      <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
         {balanceEth !== null && (
-          <span className="text-gray-400">
-            Balance: <span className={hasBalance ? "text-green-400 font-mono" : "text-red-400 font-mono"}>
+          <span style={{ color: "#71717a", fontFamily: "'Inter', sans-serif" }}>
+            Balance:{" "}
+            <span style={{
+              color: hasBalance ? "#22c55e" : "#f87171",
+              fontFamily: "'JetBrains Mono', monospace",
+            }}>
               {balanceEth} ETHx
             </span>
           </span>
         )}
-        {/* Only show wrap button once balance is fetched and is actually zero */}
         {ethxBalance !== null && !hasBalance && !isStreaming && (
           <button
             onClick={onWrap}
-            className="text-xs bg-cyan-600 hover:bg-cyan-500 text-white px-3 py-1 rounded-lg transition"
+            style={{
+              fontSize: 12, background: "#0075ff", color: "#fff",
+              padding: "4px 12px", borderRadius: 9999, border: "none", cursor: "pointer",
+              fontFamily: "'Inter', sans-serif", fontWeight: 500,
+              transition: "background 0.15s ease",
+            }}
+            onMouseEnter={e => e.currentTarget.style.background = "#1f86ff"}
+            onMouseLeave={e => e.currentTarget.style.background = "#0075ff"}
           >
             Wrap ETH → ETHx
           </button>
@@ -165,7 +215,11 @@ function StreamBar({ stream, onWrap }) {
       </div>
 
       {/* Error detail */}
-      {error && <span className="text-red-400 text-xs w-full">{error}</span>}
+      {error && (
+        <span style={{ color: "#f87171", fontSize: 12, width: "100%", fontFamily: "'Inter', sans-serif" }}>
+          {error}
+        </span>
+      )}
     </div>
   );
 }
@@ -268,46 +322,87 @@ function Controls({ onLeave, isLeavingDisabled }) {
     finally { setLeaving(false); }
   };
 
+  const btnBase = {
+    width: 48, height: 48, borderRadius: "50%", border: "none", cursor: "pointer",
+    display: "flex", alignItems: "center", justifyContent: "center", transition: "all 0.2s ease",
+    outline: "none",
+  };
+
   return (
-    <div className="flex justify-center py-4">
-      <div className="flex gap-3 bg-gray-900/90 backdrop-blur px-6 py-3 rounded-full shadow-2xl border border-gray-700">
+    <div style={{ display: "flex", justifyContent: "center", padding: "16px 0" }}>
+      <div style={{
+        display: "flex", gap: 10,
+        background: "rgba(0,0,0,0.85)", backdropFilter: "blur(20px)",
+        padding: "10px 20px", borderRadius: 9999,
+        border: "1px solid rgba(255,255,255,0.1)",
+        boxShadow: "0 8px 40px rgba(0,0,0,0.9), 0 1px 0 rgba(255,255,255,0.04) inset",
+      }}>
+        {/* Video */}
         <button
           title={isVideoOn ? "Turn off camera" : "Turn on camera"}
           onClick={() => toggle(isVideoOn, enableVideo, disableVideo, "Video")}
-          className={`w-12 h-12 flex items-center justify-center rounded-full transition-all ${
-            isVideoOn ? "bg-gray-700 hover:bg-gray-600" : "bg-red-600 hover:bg-red-500"
-          }`}
+          style={{
+            ...btnBase,
+            background: isVideoOn ? "rgba(255,255,255,0.08)" : "rgba(239,68,68,0.85)",
+          }}
+          onMouseEnter={e => e.currentTarget.style.background = isVideoOn ? "rgba(255,255,255,0.14)" : "rgba(239,68,68,1)"}
+          onMouseLeave={e => e.currentTarget.style.background = isVideoOn ? "rgba(255,255,255,0.08)" : "rgba(239,68,68,0.85)"}
         >
-          {isVideoOn ? <VideoIcon size={20} className="text-white" /> : <VideoOff size={20} className="text-white" />}
+          {isVideoOn
+            ? <VideoIcon size={19} color="#fafafa" />
+            : <VideoOff size={19} color="#fafafa" />}
         </button>
 
+        {/* Audio */}
         <button
           title={isAudioOn ? "Mute" : "Unmute"}
           onClick={() => toggle(isAudioOn, enableAudio, disableAudio, "Audio")}
-          className={`w-12 h-12 flex items-center justify-center rounded-full transition-all ${
-            isAudioOn ? "bg-gray-700 hover:bg-gray-600" : "bg-red-600 hover:bg-red-500"
-          }`}
+          style={{
+            ...btnBase,
+            background: isAudioOn ? "rgba(255,255,255,0.08)" : "rgba(239,68,68,0.85)",
+          }}
+          onMouseEnter={e => e.currentTarget.style.background = isAudioOn ? "rgba(255,255,255,0.14)" : "rgba(239,68,68,1)"}
+          onMouseLeave={e => e.currentTarget.style.background = isAudioOn ? "rgba(255,255,255,0.08)" : "rgba(239,68,68,0.85)"}
         >
-          {isAudioOn ? <Mic size={20} className="text-white" /> : <MicOff size={20} className="text-white" />}
+          {isAudioOn
+            ? <Mic size={19} color="#fafafa" />
+            : <MicOff size={19} color="#fafafa" />}
         </button>
 
+        {/* Screen share */}
         <button
           title={isSharing ? "Stop sharing" : "Share screen"}
           onClick={handleScreenShare}
-          className={`w-12 h-12 flex items-center justify-center rounded-full transition-all ${
-            isSharing ? "bg-blue-600 hover:bg-blue-500" : "bg-gray-700 hover:bg-gray-600"
-          }`}
+          style={{
+            ...btnBase,
+            background: isSharing ? "#0075ff" : "rgba(255,255,255,0.08)",
+          }}
+          onMouseEnter={e => e.currentTarget.style.background = isSharing ? "#1f86ff" : "rgba(255,255,255,0.14)"}
+          onMouseLeave={e => e.currentTarget.style.background = isSharing ? "#0075ff" : "rgba(255,255,255,0.08)"}
         >
-          {isSharing ? <MonitorOff size={20} className="text-white" /> : <Monitor size={20} className="text-white" />}
+          {isSharing
+            ? <MonitorOff size={19} color="#fafafa" />
+            : <Monitor size={19} color="#fafafa" />}
         </button>
 
+        {/* Divider */}
+        <div style={{ width: 1, background: "rgba(255,255,255,0.08)", margin: "6px 2px" }} />
+
+        {/* Leave */}
         <button
           title="Leave"
           onClick={handleLeave}
           disabled={leaving || isLeavingDisabled}
-          className="w-12 h-12 flex items-center justify-center rounded-full bg-red-600 hover:bg-red-500 transition-all disabled:opacity-50"
+          style={{
+            ...btnBase,
+            background: "rgba(239,68,68,0.85)",
+            opacity: (leaving || isLeavingDisabled) ? 0.5 : 1,
+            cursor: (leaving || isLeavingDisabled) ? "not-allowed" : "pointer",
+          }}
+          onMouseEnter={e => { if (!leaving && !isLeavingDisabled) e.currentTarget.style.background = "rgba(239,68,68,1)"; }}
+          onMouseLeave={e => { if (!leaving && !isLeavingDisabled) e.currentTarget.style.background = "rgba(239,68,68,0.85)"; }}
         >
-          {leaving ? <Spinner size="sm" color="white" /> : <PhoneOff size={20} className="text-white" />}
+          {leaving ? <Spinner size="sm" color="white" /> : <PhoneOff size={19} color="#fafafa" />}
         </button>
       </div>
     </div>
@@ -327,32 +422,70 @@ function WrapModal({ onWrap, onClose }) {
   };
 
   return (
-    <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
-      <div className="bg-gray-900 rounded-2xl border border-gray-700 p-6 w-full max-w-sm">
-        <h3 className="text-white font-bold text-lg mb-2">Wrap ETH → ETHx</h3>
-        <p className="text-gray-400 text-sm mb-4">
+    <div style={{
+      position: "fixed", inset: 0, background: "rgba(0,0,0,0.85)", backdropFilter: "blur(8px)",
+      display: "flex", alignItems: "center", justifyContent: "center", zIndex: 50, padding: 16,
+    }}>
+      <div style={{
+        background: "#0a0a0a", borderRadius: 20, border: "1px solid rgba(255,255,255,0.1)",
+        padding: 28, width: "100%", maxWidth: 380,
+        boxShadow: "0 1px 0 rgba(255,255,255,0.04) inset, 0 24px 64px rgba(0,0,0,0.9)",
+      }}>
+        {/* Top accent */}
+        <div style={{ height: 1, background: "linear-gradient(to right, rgba(0,117,255,0.7), rgba(56,189,248,0.3), transparent)", marginBottom: 20, marginLeft: -28, marginRight: -28 }} />
+
+        <h3 style={{
+          color: "#fafafa", fontWeight: 700, fontSize: 18, marginBottom: 8,
+          letterSpacing: "-0.03em", fontFamily: "'Inter', sans-serif",
+        }}>
+          Wrap ETH → ETHx
+        </h3>
+        <p style={{ color: "#71717a", fontSize: 13, marginBottom: 20, lineHeight: 1.6, fontFamily: "'Inter', sans-serif" }}>
           You need ETHx (Super ETH) to stream payments. Wrap some ETH first.
         </p>
+
         <input
           type="number"
           value={amount}
           onChange={(e) => setAmount(e.target.value)}
           step="0.001"
           min="0.001"
-          className="w-full bg-gray-800 border border-gray-600 rounded-xl px-4 py-2 text-white mb-4 focus:outline-none focus:border-cyan-500"
+          style={{
+            width: "100%", background: "#111113", border: "1px solid rgba(255,255,255,0.08)",
+            borderRadius: 12, padding: "11px 14px", color: "#fafafa", marginBottom: 16,
+            outline: "none", fontSize: 14, fontFamily: "'JetBrains Mono', monospace",
+            transition: "border-color 0.2s",
+          }}
+          onFocus={e => e.currentTarget.style.borderColor = "rgba(0,117,255,0.7)"}
+          onBlur={e => e.currentTarget.style.borderColor = "rgba(255,255,255,0.08)"}
           placeholder="Amount in ETH"
         />
-        <div className="flex gap-3">
+
+        <div style={{ display: "flex", gap: 10 }}>
           <button
             onClick={handleWrap}
             disabled={loading}
-            className="flex-1 bg-cyan-600 hover:bg-cyan-500 text-white py-2 rounded-xl font-semibold transition disabled:opacity-50"
+            style={{
+              flex: 1, background: "#0075ff", color: "#fff", padding: "11px 0",
+              borderRadius: 9999, border: "none", cursor: loading ? "not-allowed" : "pointer",
+              fontWeight: 500, fontSize: 14, fontFamily: "'Inter', sans-serif",
+              opacity: loading ? 0.5 : 1, transition: "background 0.15s ease",
+            }}
+            onMouseEnter={e => { if (!loading) e.currentTarget.style.background = "#1f86ff"; }}
+            onMouseLeave={e => { if (!loading) e.currentTarget.style.background = "#0075ff"; }}
           >
             {loading ? "Wrapping…" : "Wrap ETH"}
           </button>
           <button
             onClick={onClose}
-            className="flex-1 bg-gray-700 hover:bg-gray-600 text-white py-2 rounded-xl transition"
+            style={{
+              flex: 1, background: "transparent", color: "#a1a1aa", padding: "11px 0",
+              borderRadius: 9999, border: "1px solid rgba(255,255,255,0.12)", cursor: "pointer",
+              fontWeight: 500, fontSize: 14, fontFamily: "'Inter', sans-serif",
+              transition: "all 0.2s ease",
+            }}
+            onMouseEnter={e => { e.currentTarget.style.background = "rgba(255,255,255,0.05)"; e.currentTarget.style.color = "#fafafa"; }}
+            onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "#a1a1aa"; }}
           >
             Cancel
           </button>
@@ -466,21 +599,36 @@ function RoomContent({ roomId, hostAddress, flowRate }) {
   // ── Error screen ──────────────────────────────────────────────────────────
   if (joinError) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-gray-950">
-        <div className="text-center max-w-md px-6">
-          <div className="text-5xl mb-6">⚠️</div>
-          <h2 className="text-2xl font-bold text-white mb-3">Failed to join</h2>
-          <p className="text-gray-400 mb-6">{joinError}</p>
-          <div className="flex gap-3 justify-center">
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "center", minHeight: "100vh", background: "#000000", fontFamily: "'Inter', sans-serif" }}>
+        <div style={{ textAlign: "center", maxWidth: 440, padding: "0 24px" }}>
+          <div style={{ fontSize: 48, marginBottom: 20 }}>⚠️</div>
+          <h2 style={{ color: "#fafafa", fontSize: 24, fontWeight: 700, marginBottom: 12, letterSpacing: "-0.03em" }}>
+            Failed to join
+          </h2>
+          <p style={{ color: "#71717a", marginBottom: 28, lineHeight: 1.6, fontSize: 14 }}>{joinError}</p>
+          <div style={{ display: "flex", gap: 10, justifyContent: "center" }}>
             <button
               onClick={() => { setJoinError(null); joinedRef.current = false; }}
-              className="px-5 py-2 bg-blue-600 text-white rounded-xl hover:bg-blue-500 transition"
+              style={{
+                padding: "10px 22px", background: "#0075ff", color: "#fff", border: "none",
+                borderRadius: 9999, cursor: "pointer", fontWeight: 500, fontSize: 14,
+                fontFamily: "'Inter', sans-serif", transition: "background 0.15s ease",
+              }}
+              onMouseEnter={e => e.currentTarget.style.background = "#1f86ff"}
+              onMouseLeave={e => e.currentTarget.style.background = "#0075ff"}
             >
               Retry
             </button>
             <button
               onClick={() => router.push("/my-classes")}
-              className="px-5 py-2 bg-gray-700 text-white rounded-xl hover:bg-gray-600 transition"
+              style={{
+                padding: "10px 22px", background: "transparent", color: "#a1a1aa",
+                border: "1px solid rgba(255,255,255,0.15)", borderRadius: 9999, cursor: "pointer",
+                fontWeight: 500, fontSize: 14, fontFamily: "'Inter', sans-serif",
+                transition: "all 0.2s ease",
+              }}
+              onMouseEnter={e => { e.currentTarget.style.background = "rgba(255,255,255,0.05)"; e.currentTarget.style.color = "#fafafa"; }}
+              onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "#a1a1aa"; }}
             >
               Back
             </button>
@@ -493,13 +641,19 @@ function RoomContent({ roomId, hostAddress, flowRate }) {
   // ── Connecting screen ─────────────────────────────────────────────────────
   if (state !== "connected") {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-gray-950">
-        <div className="text-center">
-          <div className="w-16 h-16 border-4 border-cyan-500 border-t-transparent rounded-full animate-spin mx-auto mb-6" />
-          <h2 className="text-xl font-bold text-white mb-2">
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "center", minHeight: "100vh", background: "#000000", fontFamily: "'Inter', sans-serif" }}>
+        <div style={{ textAlign: "center" }}>
+          <div style={{
+            width: 48, height: 48, margin: "0 auto 24px",
+            border: "3px solid rgba(255,255,255,0.08)",
+            borderTop: "3px solid #0075ff",
+            borderRadius: "50%",
+            animation: "spin 0.8s linear infinite",
+          }} />
+          <h2 style={{ color: "#fafafa", fontSize: 18, fontWeight: 600, marginBottom: 8, letterSpacing: "-0.02em" }}>
             {state === "connecting" ? "Connecting to room…" : "Joining session…"}
           </h2>
-          <p className="text-gray-400 text-sm">Please wait</p>
+          <p style={{ color: "#71717a", fontSize: 13 }}>Please wait</p>
         </div>
       </div>
     );
@@ -507,36 +661,68 @@ function RoomContent({ roomId, hostAddress, flowRate }) {
 
   // ── In-meeting screen ─────────────────────────────────────────────────────
   return (
-    <div className="min-h-screen bg-gray-950 text-white flex flex-col">
+    <div style={{ minHeight: "100vh", background: "#000000", color: "#fafafa", display: "flex", flexDirection: "column", fontFamily: "'Inter', sans-serif" }}>
+
       {/* Header */}
-      <div className="flex items-center justify-between px-6 py-3 border-b border-gray-800 shrink-0">
-        <span className="font-black text-lg tracking-wide text-white">Teacho</span>
-        <div className="flex items-center gap-3">
-          <span className="text-xs text-gray-400 font-mono bg-gray-800 px-3 py-1 rounded-full">
+      <div style={{
+        display: "flex", alignItems: "center", justifyContent: "space-between",
+        padding: "0 24px", height: 60, flexShrink: 0,
+        borderBottom: "1px solid rgba(255,255,255,0.06)",
+        background: "rgba(0,0,0,0.8)", backdropFilter: "blur(18px)",
+      }}>
+        {/* Logo */}
+        <div style={{ display: "flex", alignItems: "center", gap: 9 }}>
+          <svg width="18" height="16" viewBox="0 0 18 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="0"  y="8" width="4" height="8" rx="1" fill="white" opacity="0.45"/>
+            <rect x="7"  y="4" width="4" height="12" rx="1" fill="white" opacity="0.72"/>
+            <rect x="14" y="0" width="4" height="16" rx="1" fill="white"/>
+          </svg>
+          <span style={{ fontWeight: 700, fontSize: 16, letterSpacing: "-0.04em", color: "#fafafa" }}>Teacho</span>
+        </div>
+
+        {/* Right: meta */}
+        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+          <span style={{
+            fontSize: 11, color: "#52525b", padding: "3px 10px", borderRadius: 9999,
+            background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)",
+            fontFamily: "'JetBrains Mono', monospace",
+          }}>
             {roomId}
           </span>
+
           {isHost ? (
-            <span className="text-xs bg-purple-900 text-purple-300 px-3 py-1 rounded-full font-semibold">Host</span>
+            <span style={{
+              fontSize: 11, padding: "3px 10px", borderRadius: 9999, fontWeight: 600,
+              background: "rgba(139,92,246,0.12)", color: "#a78bfa",
+              border: "1px solid rgba(139,92,246,0.2)", fontFamily: "'Inter', sans-serif",
+            }}>
+              Host
+            </span>
           ) : (
-            <span className={`text-xs px-3 py-1 rounded-full font-semibold ${
-              stream.isStreaming ? "bg-green-900 text-green-300" : "bg-gray-800 text-gray-400"
-            }`}>
+            <span style={{
+              fontSize: 11, padding: "3px 10px", borderRadius: 9999, fontWeight: 600,
+              background: stream.isStreaming ? "rgba(34,197,94,0.1)" : "rgba(255,255,255,0.05)",
+              color: stream.isStreaming ? "#22c55e" : "#71717a",
+              border: stream.isStreaming ? "1px solid rgba(34,197,94,0.2)" : "1px solid rgba(255,255,255,0.07)",
+              fontFamily: "'Inter', sans-serif",
+            }}>
               {stream.isStreaming ? "💸 Streaming" : "Student"}
             </span>
           )}
-          <span className="flex items-center gap-1.5 text-xs text-green-400">
-            <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
+
+          <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12, color: "#22c55e", fontFamily: "'Inter', sans-serif" }}>
+            <span style={{ width: 7, height: 7, background: "#22c55e", borderRadius: "50%", display: "inline-block", animation: "pulseGlow 2s ease-in-out infinite" }} />
             Live
-          </span>
+          </div>
         </div>
       </div>
 
       {/* Video grid */}
-      <div className="flex-1 p-4 overflow-auto">
-        <div
-          className="grid gap-3"
-          style={{ gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))" }}
-        >
+      <div style={{ flex: 1, padding: 16, overflowY: "auto" }}>
+        <div style={{
+          display: "grid", gap: 12,
+          gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))",
+        }}>
           <LocalTile isHost={isHost} />
           <PeersGrid />
         </div>
@@ -548,7 +734,7 @@ function RoomContent({ roomId, hostAddress, flowRate }) {
       )}
 
       {/* Controls */}
-      <div className="shrink-0 bg-gray-950 border-t border-gray-800">
+      <div style={{ flexShrink: 0, background: "#000000", borderTop: "1px solid rgba(255,255,255,0.06)" }}>
         <Controls onLeave={handleLeave} isLeavingDisabled={stream.isLoading} />
       </div>
 
@@ -570,8 +756,14 @@ export default function RoomPage() {
 
   if (!roomId) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-gray-950 text-white">
-        <Spinner size="xl" color="cyan.400" />
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "center", minHeight: "100vh", background: "#000000" }}>
+        <div style={{
+          width: 40, height: 40,
+          border: "3px solid rgba(255,255,255,0.08)",
+          borderTop: "3px solid #0075ff",
+          borderRadius: "50%",
+          animation: "spin 0.8s linear infinite",
+        }} />
       </div>
     );
   }

@@ -368,7 +368,7 @@ export default function Home() {
               px={{ base: 5, md: 8 }} pb={4}
             >
               <Text fontSize="12px" color="#3f3f46" fontFamily="'JetBrains Mono', monospace">
-                © 2025 Teacho · Base Sepolia Testnet
+                © 2026 Teacho · Base Sepolia Testnet
               </Text>
               <Text fontSize="12px" color="#3f3f46">
                 Open source · MIT

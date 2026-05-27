@@ -176,10 +176,12 @@ export default function Navbar() {
           flexDirection="column"
           gap="5px"
         >
-          <Box w="14px" h="1.5px" bg={mobileOpen ? "transparent" : "#a1a1aa"} transition="all 0.2s" />
-          <Box w="14px" h="1.5px" bg="#a1a1aa" transition="all 0.2s"
-            transform={mobileOpen ? "rotate(45deg) translateY(-0px)" : "none"} />
-          <Box w="14px" h="1.5px" bg={mobileOpen ? "transparent" : "#a1a1aa"} transition="all 0.2s" />
+          <Box w="14px" h="1.5px" bg="#a1a1aa" transition="all 0.25s ease"
+            transform={mobileOpen ? "rotate(45deg) translateY(6.5px)" : "none"} />
+          <Box w="14px" h="1.5px" bg="#a1a1aa" transition="all 0.25s ease"
+            opacity={mobileOpen ? 0 : 1} />
+          <Box w="14px" h="1.5px" bg="#a1a1aa" transition="all 0.25s ease"
+            transform={mobileOpen ? "rotate(-45deg) translateY(-6.5px)" : "none"} />
         </Box>
       </Flex>
 
