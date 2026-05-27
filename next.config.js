@@ -52,6 +52,10 @@ const nextConfig = {
   },
 
   webpack: (config) => {
+    // @privy-io/react-auth v3 optionally imports @farcaster/mini-app-solana
+    // for Farcaster mini-app support. We don't use Farcaster, so stub it out
+    // to prevent a build-blocking "Module not found" error.
+    config.resolve.alias["@farcaster/mini-app-solana"] = false;
     return config;
   },
 };
