@@ -29,6 +29,28 @@ export const useWeb3 = () => {
 
   const isEmbeddedWallet = wallets[0]?.walletClientType === "privy";
 
+  // ── Auto-fund new embedded wallet users ────────────────────────────────────
+  // When someone signs in with Google/email, Privy creates an embedded wallet.
+  // We silently call our /api/fund-wallet endpoint which sends them testnet ETH
+  // + ETHx from a dispenser wallet so they never need to touch a faucet.
+  // The API is idempotent — duplicate calls for the same address are no-ops.
+  useEffect(() => {
+    const autoFund = async () => {
+      const wallet = wallets[0];
+      if (!wallet?.address || wallet.walletClientType !== "privy") return;
+      try {
+        await fetch("/api/fund-wallet", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ address: wallet.address }),
+        });
+      } catch {
+        // Non-critical — user can still use the app if funding fails
+      }
+    };
+    if (authenticated && isEmbeddedWallet) autoFund();
+  }, [wallets[0]?.address, authenticated, isEmbeddedWallet]);
+
   // ── Contract initialisation ────────────────────────────────────────────────
   // Uses Privy's direct EIP-1193 provider (wallet.getEthereumProvider()) instead
   // of wagmi's walletClient. This bypasses the wagmi bridge entirely so the
