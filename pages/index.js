@@ -117,14 +117,17 @@ export default function Home() {
 
               {/* CTAs */}
               <motion.div variants={fadeUp}>
-                {isConnected && short ? (
+                {isConnected ? (
                   <Stack align="center" spacing={4}>
-                    <Flex align="center" gap={2}
-                      h="28px" px={3} borderRadius="9999px"
-                      bg="rgba(255,255,255,0.04)" border="1px solid rgba(255,255,255,0.08)">
-                      <Box w="6px" h="6px" bg="#00b34a" borderRadius="full" />
-                      <Text fontSize="11px" fontFamily="'JetBrains Mono', monospace" color="#a1a1aa">{short}</Text>
-                    </Flex>
+                    {/* Show address pill only once wallet address is available */}
+                    {short && (
+                      <Flex align="center" gap={2}
+                        h="28px" px={3} borderRadius="9999px"
+                        bg="rgba(255,255,255,0.04)" border="1px solid rgba(255,255,255,0.08)">
+                        <Box w="6px" h="6px" bg="#00b34a" borderRadius="full" />
+                        <Text fontSize="11px" fontFamily="'JetBrains Mono', monospace" color="#a1a1aa">{short}</Text>
+                      </Flex>
+                    )}
                     <Flex gap={3} wrap="wrap" justify="center">
                       <button className="btn-primary" onClick={() => router.push("/gigs")}
                         style={{ height: 40, padding: "0 22px", fontSize: 14 }}>

@@ -155,7 +155,7 @@ export default function Gigs() {
             </Heading>
             <Text color="#71717a" fontSize="14px">Live blockchain-powered sessions</Text>
           </Box>
-          {isConnected && (
+          {isConnected && contract && (
             <button className="btn-outline-pill" onClick={fetchGigs}
               disabled={loading} style={{ opacity: loading ? 0.5 : 1 }}>
               {loading ? "Loading…" : "Refresh"}
@@ -179,8 +179,22 @@ export default function Gigs() {
           </Box>
         )}
 
+        {/* Connected but wagmi bridge still syncing — show spinner, not empty state */}
+        {isConnected && !contract && !loading && (
+          <Box textAlign="center" py={28}>
+            <Box
+              w="40px" h="40px" mx="auto" mb={5}
+              border="3px solid rgba(255,255,255,0.1)"
+              borderTop="3px solid #0075ff"
+              borderRadius="full"
+              style={{ animation: "spin 0.8s linear infinite" }}
+            />
+            <Text color="#71717a" fontSize="15px">Connecting to network…</Text>
+          </Box>
+        )}
+
         {/* Error */}
-        {isConnected && error && (
+        {isConnected && contract && error && (
           <Box bg="rgba(239,68,68,0.05)" border="1px solid rgba(239,68,68,0.15)"
             borderRadius="12px" px={5} py={4} mb={8}>
             <Flex justify="space-between" align="center">
@@ -194,14 +208,14 @@ export default function Gigs() {
         )}
 
         {/* Loading */}
-        {isConnected && loading && (
+        {isConnected && contract && loading && (
           <Grid templateColumns={{ base: "1fr", md: "repeat(2,1fr)", lg: "repeat(3,1fr)" }} gap={5}>
             {[1,2,3,4,5,6].map(i => <GigSkeleton key={i} />)}
           </Grid>
         )}
 
         {/* Empty */}
-        {isConnected && !loading && !error && gigs.length === 0 && (
+        {isConnected && contract && !loading && !error && gigs.length === 0 && (
           <Box textAlign="center" py={28}>
             <Text fontSize="40px" mb={6}>📚</Text>
             <Heading fontSize="24px" fontWeight="700" letterSpacing="-0.03em" color="#fafafa" mb={3}>
@@ -218,7 +232,7 @@ export default function Gigs() {
         )}
 
         {/* Grid */}
-        {isConnected && !loading && gigs.length > 0 && (
+        {isConnected && contract && !loading && gigs.length > 0 && (
           <>
             <Text color="#52525b" fontSize="13px" mb={6}>
               {gigs.length} class{gigs.length !== 1 ? "es" : ""} available

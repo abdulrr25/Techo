@@ -132,7 +132,7 @@ export default function MyClasses() {
               letterSpacing="-0.04em" color="#fafafa" mb={1}>My Classes</Heading>
             <Text color="#71717a" fontSize="14px">Classes you&apos;ve hosted or enrolled in</Text>
           </Box>
-          {isConnected && (
+          {isConnected && contract && (
             <HStack spacing={3}>
               <button className="btn-outline-pill" onClick={fetchMyClasses}
                 disabled={loading} style={{ opacity: loading ? 0.5 : 1 }}>
@@ -162,8 +162,22 @@ export default function MyClasses() {
           </Box>
         )}
 
+        {/* Connected but wagmi bridge still syncing — show spinner */}
+        {isConnected && !contract && !loading && (
+          <Box textAlign="center" py={28}>
+            <Box
+              w="40px" h="40px" mx="auto" mb={5}
+              border="3px solid rgba(255,255,255,0.1)"
+              borderTop="3px solid #0075ff"
+              borderRadius="full"
+              style={{ animation: "spin 0.8s linear infinite" }}
+            />
+            <Text color="#71717a" fontSize="15px">Connecting to network…</Text>
+          </Box>
+        )}
+
         {/* Error */}
-        {isConnected && error && (
+        {isConnected && contract && error && (
           <Box bg="rgba(239,68,68,0.05)" border="1px solid rgba(239,68,68,0.15)"
             borderRadius="12px" px={5} py={4} mb={8}>
             <Flex justify="space-between" align="center">
@@ -177,14 +191,14 @@ export default function MyClasses() {
         )}
 
         {/* Loading */}
-        {isConnected && loading && (
+        {isConnected && contract && loading && (
           <Grid templateColumns={{ base: "1fr", md: "repeat(2,1fr)", lg: "repeat(3,1fr)" }} gap={5}>
             {[1,2,3].map(i => <CardSkeleton key={i} />)}
           </Grid>
         )}
 
         {/* Content */}
-        {isConnected && !loading && !error && (
+        {isConnected && contract && !loading && !error && (
           <>
             {classes.length === 0 ? (
               <Box textAlign="center" py={28}>

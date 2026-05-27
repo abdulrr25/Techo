@@ -53,9 +53,13 @@ const nextConfig = {
 
   webpack: (config) => {
     // @privy-io/react-auth v3 optionally imports @farcaster/mini-app-solana
-    // for Farcaster mini-app support. We don't use Farcaster, so stub it out
-    // to prevent a build-blocking "Module not found" error.
+    // for Farcaster mini-app support. We don't use Farcaster, so stub it out.
     config.resolve.alias["@farcaster/mini-app-solana"] = false;
+
+    // @metamask/sdk (pulled in by Privy) references @react-native-async-storage
+    // which is a React Native-only package. Stub it out for the browser build.
+    config.resolve.alias["@react-native-async-storage/async-storage"] = false;
+
     return config;
   },
 };

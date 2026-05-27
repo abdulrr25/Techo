@@ -15,9 +15,10 @@ export default function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
 
   // Privy for auth actions and ready state
-  const { login, logout, ready, authenticated } = usePrivy();
-  // useWeb3 for the wallet address (now comes from wagmi, bridged by Privy)
-  const { account } = useWeb3();
+  const { login, ready, authenticated } = usePrivy();
+  // useWeb3 for the wallet address and disconnect (disconnect calls both
+  // privyLogout + wagmiDisconnect to fully clear auth and wagmi state)
+  const { account, disconnect } = useWeb3();
   const router = useRouter();
 
   useEffect(() => {
@@ -120,7 +121,7 @@ export default function Navbar() {
               {/* Disconnect */}
               <Box
                 as="button"
-                onClick={logout}
+                onClick={disconnect}
                 h="32px" px={4}
                 borderRadius="9999px"
                 fontSize="13px"
@@ -228,7 +229,7 @@ export default function Navbar() {
                 <Box w="6px" h="6px" bg="#00b34a" borderRadius="full" flexShrink={0} />
                 <Text fontSize="12px" fontFamily="'JetBrains Mono', monospace" color="#a1a1aa">{short ?? "Connected"}</Text>
               </Flex>
-              <Box as="button" onClick={logout} py={2.5} borderRadius="10px"
+              <Box as="button" onClick={disconnect} py={2.5} borderRadius="10px"
                 fontSize="14px" fontWeight="500" fontFamily="'Inter', sans-serif"
                 color="#a1a1aa" bg="transparent" border="1px solid rgba(255,255,255,0.08)"
                 cursor="pointer" w="full"

@@ -1,9 +1,12 @@
 import { ChakraProvider, extendTheme } from "@chakra-ui/react";
-import { createConfig, http } from "wagmi";
 import { baseSepolia } from "wagmi/chains";
-// WagmiProvider from @privy-io/wagmi bridges Privy wallets into wagmi so all
-// existing wagmi hooks (useAccount, useWalletClient, etc.) keep working.
-import { WagmiProvider } from "@privy-io/wagmi";
+import { http } from "wagmi";
+// IMPORTANT: createConfig and WagmiProvider MUST both come from @privy-io/wagmi,
+// NOT from wagmi. @privy-io/wagmi's createConfig adds ssr:true,
+// multiInjectedProviderDiscovery:false, and strips non-Privy connectors so
+// useSyncPrivyWallets can inject the embedded wallet connector after login.
+// Using wagmi's createConfig breaks the bridge and leaves useAccount() empty.
+import { WagmiProvider, createConfig } from "@privy-io/wagmi";
 import { PrivyProvider } from "@privy-io/react-auth";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ErrorBoundary } from "react-error-boundary";

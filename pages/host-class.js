@@ -217,11 +217,11 @@ export default function HostClass() {
                       <button
                         type="submit"
                         className="btn-primary"
-                        disabled={!isConnected || loading}
+                        disabled={!isConnected || !contract || loading}
                         style={{
                           width: "100%", height: 48, fontSize: 15,
-                          opacity: (!isConnected || loading) ? 0.45 : 1,
-                          cursor: (!isConnected || loading) ? "not-allowed" : "pointer",
+                          opacity: (!isConnected || !contract || loading) ? 0.45 : 1,
+                          cursor: (!isConnected || !contract || loading) ? "not-allowed" : "pointer",
                         }}
                       >
                         {loading ? "Creating class…" : "Create Class"}

@@ -224,6 +224,10 @@ html, body {
 .animate-float     { animation: float     6s ease-in-out infinite; }
 .animate-pulseGlow { animation: pulseGlow 3s ease-in-out infinite; }
 
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
 /* ── Footer watermark ──────────────────────────────────────────────────────── */
 .footer-watermark {
   font-size: clamp(72px, 18vw, 300px);
