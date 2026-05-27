@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
-import { Box, Flex, Text, Button, HStack, Stack, Collapse } from "@chakra-ui/react";
+import { Box, Flex, Text, HStack, Stack, Collapse } from "@chakra-ui/react";
+import { usePrivy } from "@privy-io/react-auth";
 import { useWeb3 } from "../hooks/useWeb3";
 
 const NAV_ITEMS = [
@@ -10,9 +11,13 @@ const NAV_ITEMS = [
 ];
 
 export default function Navbar() {
-  const [scrolled,    setScrolled]    = useState(false);
-  const [mobileOpen,  setMobileOpen]  = useState(false);
-  const { account, isConnected, isConnecting, connect, disconnect } = useWeb3();
+  const [scrolled,   setScrolled]   = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
+
+  // Privy for auth actions and ready state
+  const { login, logout, ready, authenticated } = usePrivy();
+  // useWeb3 for the wallet address (now comes from wagmi, bridged by Privy)
+  const { account } = useWeb3();
   const router = useRouter();
 
   useEffect(() => {
@@ -22,6 +27,9 @@ export default function Navbar() {
   }, []);
 
   const short = account ? `${account.slice(0, 6)}…${account.slice(-4)}` : null;
+
+  // Privy not yet initialised — show a disabled button to avoid hydration flash
+  const isLoading = !ready;
 
   return (
     <Box
@@ -44,7 +52,6 @@ export default function Navbar() {
           onClick={() => router.push("/")} role="link"
           _hover={{ opacity: 0.85 }} transition="opacity 0.15s"
         >
-          {/* Brand mark — 3 stacked signal bars */}
           <svg width="18" height="16" viewBox="0 0 18 16" fill="none" xmlns="http://www.w3.org/2000/svg">
             <rect x="0"  y="8" width="4" height="8" rx="1" fill="white" opacity="0.45"/>
             <rect x="7"  y="4" width="4" height="12" rx="1" fill="white" opacity="0.72"/>
@@ -92,7 +99,7 @@ export default function Navbar() {
 
         {/* Wallet — desktop */}
         <HStack spacing={3} display={{ base: "none", md: "flex" }}>
-          {isConnected && short ? (
+          {authenticated && short ? (
             <HStack spacing={2}>
               {/* Address pill */}
               <Flex
@@ -108,7 +115,7 @@ export default function Navbar() {
               {/* Disconnect */}
               <Box
                 as="button"
-                onClick={disconnect}
+                onClick={logout}
                 h="32px" px={4}
                 borderRadius="9999px"
                 fontSize="13px"
@@ -127,21 +134,21 @@ export default function Navbar() {
           ) : (
             <Box
               as="button"
-              onClick={connect}
+              onClick={isLoading ? undefined : login}
               h="36px" px={4}
               borderRadius="9999px"
               fontSize="14px"
               fontWeight="500"
               fontFamily="'Inter', sans-serif"
               color="white"
-              bg={isConnecting ? "rgba(255,255,255,0.1)" : "transparent"}
+              bg={isLoading ? "rgba(255,255,255,0.1)" : "transparent"}
               border="1px solid rgba(255,255,255,0.22)"
-              cursor="pointer"
-              _hover={{ bg: "rgba(255,255,255,0.06)", borderColor: "rgba(255,255,255,0.4)" }}
+              cursor={isLoading ? "default" : "pointer"}
+              _hover={isLoading ? {} : { bg: "rgba(255,255,255,0.06)", borderColor: "rgba(255,255,255,0.4)" }}
               transition="all 0.2s ease"
-              opacity={isConnecting ? 0.6 : 1}
+              opacity={isLoading ? 0.5 : 1}
             >
-              {isConnecting ? "Connecting…" : "Connect Wallet"}
+              {isLoading ? "Loading…" : "Connect Wallet"}
             </Box>
           )}
         </HStack>
@@ -209,14 +216,14 @@ export default function Navbar() {
 
           <Box className="divider-soft" mb={3} />
 
-          {isConnected && short ? (
+          {authenticated && short ? (
             <Stack spacing={2}>
               <Flex align="center" gap={2} px={3} py={2} borderRadius="10px"
                 bg="rgba(255,255,255,0.03)" border="1px solid rgba(255,255,255,0.07)">
                 <Box w="6px" h="6px" bg="#00b34a" borderRadius="full" flexShrink={0} />
                 <Text fontSize="12px" fontFamily="'JetBrains Mono', monospace" color="#a1a1aa">{short}</Text>
               </Flex>
-              <Box as="button" onClick={disconnect} py={2.5} borderRadius="10px"
+              <Box as="button" onClick={logout} py={2.5} borderRadius="10px"
                 fontSize="14px" fontWeight="500" fontFamily="'Inter', sans-serif"
                 color="#a1a1aa" bg="transparent" border="1px solid rgba(255,255,255,0.08)"
                 cursor="pointer" w="full"
@@ -226,11 +233,19 @@ export default function Navbar() {
               </Box>
             </Stack>
           ) : (
-            <Box as="button" onClick={connect} py={2.5} borderRadius="9999px"
+            <Box
+              as="button"
+              onClick={isLoading ? undefined : login}
+              py={2.5} borderRadius="9999px"
               fontSize="14px" fontWeight="500" fontFamily="'Inter', sans-serif"
-              color="white" bg="#0075ff" border="none" cursor="pointer" w="full"
-              _hover={{ bg: "#1f86ff" }} transition="background 0.15s">
-              Connect Wallet
+              color="white" bg="#0075ff" border="none"
+              cursor={isLoading ? "default" : "pointer"}
+              w="full"
+              opacity={isLoading ? 0.5 : 1}
+              _hover={isLoading ? {} : { bg: "#1f86ff" }}
+              transition="background 0.15s"
+            >
+              {isLoading ? "Loading…" : "Connect Wallet"}
             </Box>
           )}
         </Box>

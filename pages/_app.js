@@ -1,7 +1,10 @@
 import { ChakraProvider, extendTheme } from "@chakra-ui/react";
-import { WagmiProvider, createConfig, http } from "wagmi";
+import { createConfig, http } from "wagmi";
 import { baseSepolia } from "wagmi/chains";
-import { injected } from "wagmi/connectors";
+// WagmiProvider from @privy-io/wagmi bridges Privy wallets into wagmi so all
+// existing wagmi hooks (useAccount, useWalletClient, etc.) keep working.
+import { WagmiProvider } from "@privy-io/wagmi";
+import { PrivyProvider } from "@privy-io/react-auth";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ErrorBoundary } from "react-error-boundary";
 import "../styles/globals.css";
@@ -112,9 +115,11 @@ const theme = extendTheme({
   },
 });
 
+// No connectors here — Privy's WagmiProvider injects them based on how the
+// user authenticates (MetaMask connector for wallet login, privy connector for
+// email/google embedded wallets). Keeping injected() would cause duplicates.
 const wagmiConfig = createConfig({
   chains: [baseSepolia],
-  connectors: [injected()],
   transports: { [baseSepolia.id]: http(process.env.NEXT_PUBLIC_RPC_URL) },
 });
 
@@ -145,13 +150,39 @@ function ErrorFallback({ error, resetErrorBoundary }) {
 function MyApp({ Component, pageProps }) {
   return (
     <ErrorBoundary FallbackComponent={ErrorFallback} onReset={() => window.location.reload()}>
-      <WagmiProvider config={wagmiConfig}>
+      {/*
+        Provider nesting order matters:
+        PrivyProvider  — manages auth session (MetaMask / email / google)
+          QueryClientProvider — react-query (Privy needs this available)
+            WagmiProvider (@privy-io/wagmi) — bridges Privy wallets into wagmi
+              ChakraProvider — UI theme
+      */}
+      <PrivyProvider
+        appId={process.env.NEXT_PUBLIC_PRIVY_APP_ID}
+        config={{
+          loginMethods: ["wallet", "email", "google"],
+          embeddedWallets: {
+            // Only create a wallet for users who log in via email/google.
+            // MetaMask users already have a wallet — don't create a duplicate.
+            createOnLogin: "users-without-wallets",
+          },
+          defaultChain: baseSepolia,
+          supportedChains: [baseSepolia],
+          appearance: {
+            theme: "dark",
+            accentColor: "#0075ff",   // Matches Teacho's Morphic blue
+            walletList: ["metamask", "detected_wallets"],
+          },
+        }}
+      >
         <QueryClientProvider client={queryClient}>
-          <ChakraProvider theme={theme}>
-            <Component {...pageProps} />
-          </ChakraProvider>
+          <WagmiProvider config={wagmiConfig}>
+            <ChakraProvider theme={theme}>
+              <Component {...pageProps} />
+            </ChakraProvider>
+          </WagmiProvider>
         </QueryClientProvider>
-      </WagmiProvider>
+      </PrivyProvider>
     </ErrorBoundary>
   );
 }

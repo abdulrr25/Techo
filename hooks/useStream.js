@@ -1,4 +1,5 @@
 import { useState, useCallback, useEffect } from "react";
+import { useWalletClient } from "wagmi";
 import { BrowserProvider, Contract, parseEther, formatEther } from "ethers";
 import { CFA_FORWARDER_ABI, SUPER_TOKEN_ABI } from "../constants/superfluidAbi";
 
@@ -7,6 +8,10 @@ const SUPER_TOKEN_ADDRESS = process.env.NEXT_PUBLIC_SUPER_TOKEN_ADDRESS;
 
 // Status: idle | wrapping | creating | streaming | deleting | stopped | error
 export function useStream({ senderAddress, receiverAddress, flowRate }) {
+  // wagmi walletClient works for BOTH MetaMask and Privy embedded wallets —
+  // never read window.ethereum directly here as embedded wallets won't have it.
+  const { data: walletClient } = useWalletClient();
+
   const [status, setStatus] = useState("idle");
   const [error, setError] = useState(null);
   const [ethxBalance, setEthxBalance] = useState(null);
@@ -23,20 +28,22 @@ export function useStream({ senderAddress, receiverAddress, flowRate }) {
     return () => clearInterval(id);
   }, [status, streamStartTime]);
 
-  // ── Helpers ────────────────────────────────────────────────────────────────
-  const getSigner = async () => {
-    if (typeof window === "undefined" || !window.ethereum) {
-      throw new Error("MetaMask not found");
+  // ── Signer helper ──────────────────────────────────────────────────────────
+  // Uses wagmi walletClient transport so this works for MetaMask AND Privy
+  // embedded wallets. Do NOT change to window.ethereum.
+  const getSigner = useCallback(async () => {
+    if (!walletClient) {
+      throw new Error("No wallet connected");
     }
-    const provider = new BrowserProvider(window.ethereum);
+    const provider = new BrowserProvider(walletClient.transport);
     return provider.getSigner();
-  };
+  }, [walletClient]);
 
-  const getForwarder = async (signer) =>
-    new Contract(FORWARDER_ADDRESS, CFA_FORWARDER_ABI, signer);
+  const getForwarder = useCallback(async (signer) =>
+    new Contract(FORWARDER_ADDRESS, CFA_FORWARDER_ABI, signer), []);
 
-  const getSuperToken = async (signer) =>
-    new Contract(SUPER_TOKEN_ADDRESS, SUPER_TOKEN_ABI, signer);
+  const getSuperToken = useCallback(async (signer) =>
+    new Contract(SUPER_TOKEN_ADDRESS, SUPER_TOKEN_ABI, signer), []);
 
   // ── Read ETHx balance ──────────────────────────────────────────────────────
   const refreshBalance = useCallback(async () => {
@@ -49,7 +56,7 @@ export function useStream({ senderAddress, receiverAddress, flowRate }) {
     } catch (err) {
       console.error("Balance check failed:", err);
     }
-  }, [senderAddress]);
+  }, [senderAddress, getSigner, getSuperToken]);
 
   // ── Wrap ETH → ETHx ────────────────────────────────────────────────────────
   const wrapEth = useCallback(
@@ -71,7 +78,7 @@ export function useStream({ senderAddress, receiverAddress, flowRate }) {
         throw err;
       }
     },
-    [refreshBalance]
+    [getSigner, getSuperToken, refreshBalance]
   );
 
   // ── Check if a live flow exists ────────────────────────────────────────────
@@ -90,7 +97,7 @@ export function useStream({ senderAddress, receiverAddress, flowRate }) {
       console.error("getFlowrate failed:", err);
       return null;
     }
-  }, [senderAddress, receiverAddress]);
+  }, [senderAddress, receiverAddress, getSigner, getForwarder]);
 
   // ── Create stream ──────────────────────────────────────────────────────────
   const createStream = useCallback(async () => {
@@ -99,6 +106,11 @@ export function useStream({ senderAddress, receiverAddress, flowRate }) {
     }
     setError(null);
     setStatus("creating");
+
+    // TODO (phase 2): funding branch for embedded wallets goes here.
+    // Check isEmbeddedWallet (from useWeb3) and if ETHx balance is zero,
+    // trigger the on-ramp / auto-wrap flow before proceeding to createFlow.
+
     try {
       // Guard: don't double-create
       const existing = await checkExistingStream();
@@ -134,7 +146,7 @@ export function useStream({ senderAddress, receiverAddress, flowRate }) {
       setStatus("error");
       throw err;
     }
-  }, [senderAddress, receiverAddress, flowRate, checkExistingStream, refreshBalance]);
+  }, [senderAddress, receiverAddress, flowRate, checkExistingStream, getSigner, getForwarder, refreshBalance]);
 
   // ── Delete stream ──────────────────────────────────────────────────────────
   const deleteStream = useCallback(async () => {
@@ -170,7 +182,7 @@ export function useStream({ senderAddress, receiverAddress, flowRate }) {
       setStatus("stopped");
       console.error("deleteFlow error:", err);
     }
-  }, [senderAddress, receiverAddress, checkExistingStream, refreshBalance]);
+  }, [senderAddress, receiverAddress, checkExistingStream, getSigner, getForwarder, refreshBalance]);
 
   // ── Computed helpers ───────────────────────────────────────────────────────
   const isStreaming = status === "streaming";
