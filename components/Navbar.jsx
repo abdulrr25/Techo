@@ -31,6 +31,11 @@ export default function Navbar() {
   // Privy not yet initialised — show a disabled button to avoid hydration flash
   const isLoading = !ready;
 
+  // After Google/email login, `authenticated` is true before the embedded wallet
+  // address propagates into wagmi. Show the pill as soon as we're authenticated,
+  // falling back to "Connected" label if the address isn't ready yet.
+  const showConnected = authenticated;
+
   return (
     <Box
       as="header"
@@ -99,7 +104,7 @@ export default function Navbar() {
 
         {/* Wallet — desktop */}
         <HStack spacing={3} display={{ base: "none", md: "flex" }}>
-          {authenticated && short ? (
+          {showConnected ? (
             <HStack spacing={2}>
               {/* Address pill */}
               <Flex
@@ -110,7 +115,7 @@ export default function Navbar() {
                 border="1px solid rgba(255,255,255,0.08)"
               >
                 <Box w="6px" h="6px" bg="#00b34a" borderRadius="full" flexShrink={0} />
-                <Text fontSize="13px" fontFamily="'JetBrains Mono', monospace" color="#a1a1aa">{short}</Text>
+                <Text fontSize="13px" fontFamily="'JetBrains Mono', monospace" color="#a1a1aa">{short ?? "Connected"}</Text>
               </Flex>
               {/* Disconnect */}
               <Box
@@ -216,12 +221,12 @@ export default function Navbar() {
 
           <Box className="divider-soft" mb={3} />
 
-          {authenticated && short ? (
+          {showConnected ? (
             <Stack spacing={2}>
               <Flex align="center" gap={2} px={3} py={2} borderRadius="10px"
                 bg="rgba(255,255,255,0.03)" border="1px solid rgba(255,255,255,0.07)">
                 <Box w="6px" h="6px" bg="#00b34a" borderRadius="full" flexShrink={0} />
-                <Text fontSize="12px" fontFamily="'JetBrains Mono', monospace" color="#a1a1aa">{short}</Text>
+                <Text fontSize="12px" fontFamily="'JetBrains Mono', monospace" color="#a1a1aa">{short ?? "Connected"}</Text>
               </Flex>
               <Box as="button" onClick={logout} py={2.5} borderRadius="10px"
                 fontSize="14px" fontWeight="500" fontFamily="'Inter', sans-serif"

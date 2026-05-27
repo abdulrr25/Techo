@@ -9,7 +9,11 @@ const CONTRACT_ADDRESS = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS;
 
 export const useWeb3 = () => {
   const { login, logout: privyLogout, user, ready, authenticated } = usePrivy();
-  const { address: account, isConnected } = useAccount();
+  const { address: wagmiAddress, isConnected } = useAccount();
+  // Privy's embedded wallet address is available on user.wallet.address immediately
+  // after login, even before wagmi's connector syncs. Use it as a fallback so the
+  // navbar shows the address right away for email/Google logins.
+  const account = wagmiAddress ?? user?.wallet?.address;
   const { disconnect: wagmiDisconnect } = useDisconnect();
   // useWalletClient works for BOTH MetaMask and Privy embedded wallets —
   // the @privy-io/wagmi WagmiProvider exposes whichever wallet is active.
@@ -66,7 +70,7 @@ export const useWeb3 = () => {
 
   return {
     account:          mounted ? account : undefined,
-    isConnected:      mounted && isConnected,
+    isConnected:      mounted && (isConnected || !!user?.wallet?.address),
     // isConnecting reflects Privy not-yet-ready rather than wagmi pending state
     isConnecting:     mounted && !ready,
     contract,

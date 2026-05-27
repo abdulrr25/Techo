@@ -195,8 +195,8 @@ export default function Home() {
               </motion.div>
             </Box>
             <SimpleGrid columns={{ base: 1, md: 3 }} gap={10}>
-              <StepCard num={1} icon="🦊" title="Connect Wallet"
-                desc="Connect MetaMask to Base Sepolia to access the platform" />
+              <StepCard num={1} icon="👛" title="Connect Wallet"
+                desc="Connect your wallet to Base Sepolia to access the platform" />
               <StepCard num={2} icon="📖" title="Enroll & Pay 10%"
                 desc="Browse live classes and pay a 10% commitment deposit" />
               <StepCard num={3} icon="⚡" title="Stream & Learn"

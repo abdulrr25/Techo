@@ -92,7 +92,7 @@ export default function HostClass() {
       setLoading(true);
       toast({ title: "Creating meeting room…", status: "info", duration: 5000, isClosable: true });
       const meetingId     = await createRoom();
-      toast({ title: "Confirm in MetaMask…", status: "info", duration: 10000, isClosable: true });
+      toast({ title: "Confirm in your wallet…", status: "info", duration: 10000, isClosable: true });
       const stringFlowRate = parseEther(price);
       const flowRatePerSec = stringFlowRate / 3600n;
       const timeString     = new Date(meetingTime).toLocaleString();

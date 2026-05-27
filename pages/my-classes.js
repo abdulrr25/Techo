@@ -95,7 +95,7 @@ export default function MyClasses() {
 
   useEffect(() => {
     if (account && contract) fetchMyClasses();
-    else if (!isConnected) setLoading(false);
+    else setLoading(false);
   }, [account, contract, isConnected]);
 
   const fetchMyClasses = async () => {
@@ -154,7 +154,7 @@ export default function MyClasses() {
               Connect your wallet
             </Heading>
             <Text color="#71717a" fontSize="15px" mb={8} maxW="400px" mx="auto" lineHeight="1.6">
-              Connect MetaMask to view the classes you&apos;ve hosted or enrolled in.
+              Connect your wallet to view the classes you&apos;ve hosted or enrolled in.
             </Text>
             <button className="btn-primary" onClick={connect} style={{ height: 44, padding: "0 28px" }}>
               Connect Wallet

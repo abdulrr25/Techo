@@ -112,7 +112,7 @@ export default function Gigs() {
 
   useEffect(() => {
     if (contract) fetchGigs();
-    else if (!isConnected) setLoading(false);
+    else setLoading(false);
   }, [contract, isConnected]);
 
   const fetchGigs = async () => {
@@ -171,7 +171,7 @@ export default function Gigs() {
               Connect your wallet
             </Heading>
             <Text color="#71717a" fontSize="15px" mb={8} maxW="400px" mx="auto" lineHeight="1.6">
-              Connect MetaMask on Base Sepolia to browse and enroll in classes.
+              Connect your wallet on Base Sepolia to browse and enroll in classes.
             </Text>
             <button className="btn-primary" onClick={connect} style={{ height: 44, padding: "0 28px" }}>
               Connect Wallet
