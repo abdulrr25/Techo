@@ -28,7 +28,6 @@
     "@privy-io/wagmi": "^4.0.8",
     "@tanstack/react-query": "^5.24.1",
     "@wagmi/core": "^2.16.4",
-    "connectkit": "^1.4.6",
     "ethers": "^6.11.1",
     "framer-motion": "^11.0.5",
     "lucide-react": "^0.344.0",

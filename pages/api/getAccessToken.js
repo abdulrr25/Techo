@@ -6,7 +6,11 @@ export default async function handler(req, res) {
   }
 
   try {
-    const roomId = req.method === "GET" ? req.query.roomId : req.body?.roomId;
+    const isGet = req.method === "GET";
+    const roomId = isGet ? req.query.roomId : req.body?.roomId;
+    const isHost = isGet
+      ? req.query.isHost === "true"
+      : req.body?.isHost === true;
 
     if (!roomId) {
       return res.status(400).json({ error: "Room ID is required" });
@@ -17,24 +21,24 @@ export default async function handler(req, res) {
       return res.status(500).json({ error: "HUDDLE_API_KEY not configured" });
     }
 
-    // Generate JWT locally using the server SDK — no HTTP call needed
+    // Host  → Role.HOST  with full admin
+    // Student → Role.GUEST with no admin, but can produce cam/mic/screen
     const accessToken = new AccessToken({
       apiKey,
       roomId,
-      role: Role.HOST,
+      role: isHost ? Role.HOST : Role.GUEST,
       permissions: {
-        admin: true,
+        admin: isHost,
         canConsume: true,
         canProduce: true,
         canProduceSources: { cam: true, mic: true, screen: true },
         canRecvData: true,
         canSendData: true,
-        canUpdateMetadata: true,
+        canUpdateMetadata: isHost,
       },
     });
 
     const token = await accessToken.toJwt();
-    // toJwt() returns undefined for 422 (room not associated with this API key)
     if (!token) {
       return res.status(422).json({
         error: "Room not associated with this API key. Only rooms created via this app are joinable.",

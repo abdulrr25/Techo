@@ -518,12 +518,13 @@ function RoomContent({ roomId, hostAddress, flowRate }) {
 
   // ── Step 1: Join Huddle room ────────────────────────────────────────────────
   useEffect(() => {
-    if (!roomId || joinedRef.current) return;
+    if (!roomId || !account || joinedRef.current) return;
     let mounted = true;
 
     (async () => {
       try {
-        const res = await fetch(`/api/getAccessToken?roomId=${roomId}`);
+        const hostFlag = hostAddress && account.toLowerCase() === hostAddress.toLowerCase();
+        const res = await fetch(`/api/getAccessToken?roomId=${roomId}&isHost=${!!hostFlag}`);
         const data = await res.json();
         if (!res.ok || !data.token) throw new Error(data.error || "No token returned");
         if (!mounted) return;
@@ -538,7 +539,7 @@ function RoomContent({ roomId, hostAddress, flowRate }) {
     })();
 
     return () => { mounted = false; };
-  }, [roomId]);
+  }, [roomId, account]);
 
   // ── Step 2: Once connected, start Superfluid stream (students only) ─────────
   // createStream() internally calls getFlowrate first — if a stream already
