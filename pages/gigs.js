@@ -106,14 +106,24 @@ export default function Gigs() {
   const [loading, setLoading] = useState(true);
   const [buyingId, setBuyingId] = useState(null);
   const [error, setError] = useState(null);
+  const [contractWaitError, setContractWaitError] = useState(false);
   const toast = useToast();
   const router = useRouter();
-  const { account, isConnected, contract, connect } = useWeb3();
+  const { account, isConnected, contract, connect, disconnect } = useWeb3();
 
   useEffect(() => {
     if (contract) fetchGigs();
     else setLoading(false);
   }, [contract, isConnected]);
+
+  // If wallet is connected but contract is still null after 12s, the wagmi
+  // bridge likely failed (e.g. Privy CORS, wrong chain, wallet rejected reconnect).
+  // Show a recoverable error instead of spinning forever.
+  useEffect(() => {
+    if (!isConnected || contract) { setContractWaitError(false); return; }
+    const t = setTimeout(() => { if (!contract) setContractWaitError(true); }, 12000);
+    return () => clearTimeout(t);
+  }, [isConnected, contract]);
 
   const fetchGigs = async () => {
     try {
@@ -179,8 +189,8 @@ export default function Gigs() {
           </Box>
         )}
 
-        {/* Connected but wagmi bridge still syncing — show spinner, not empty state */}
-        {isConnected && !contract && !loading && (
+        {/* Connected but wagmi bridge still syncing — spinner (first 12s) */}
+        {isConnected && !contract && !loading && !contractWaitError && (
           <Box textAlign="center" py={28}>
             <Box
               w="40px" h="40px" mx="auto" mb={5}
@@ -190,6 +200,33 @@ export default function Gigs() {
               style={{ animation: "spin 0.8s linear infinite" }}
             />
             <Text color="#71717a" fontSize="15px">Connecting to network…</Text>
+          </Box>
+        )}
+
+        {/* Wallet bridge timed out — give the user a way to recover */}
+        {isConnected && !contract && !loading && contractWaitError && (
+          <Box textAlign="center" py={28}>
+            <Text fontSize="40px" mb={6}>🔌</Text>
+            <Heading fontSize="22px" fontWeight="700" letterSpacing="-0.03em" color="#fafafa" mb={3}>
+              Wallet not responding
+            </Heading>
+            <Text color="#71717a" fontSize="14px" mb={3} maxW="420px" mx="auto" lineHeight="1.6">
+              Your wallet connected but the network bridge timed out.
+              This usually means the wallet isn&apos;t on Base Sepolia, or a browser extension is blocking the connection.
+            </Text>
+            <Text color="#52525b" fontSize="13px" mb={8} maxW="420px" mx="auto">
+              Try reconnecting your wallet or refreshing the page.
+            </Text>
+            <Flex gap={3} justify="center" wrap="wrap">
+              <button className="btn-primary" onClick={() => window.location.reload()}
+                style={{ height: 40, padding: "0 22px", fontSize: 14 }}>
+                Refresh Page
+              </button>
+              <button className="btn-outline-pill" onClick={disconnect}
+                style={{ height: 40, padding: "0 22px", fontSize: 14 }}>
+                Reconnect Wallet
+              </button>
+            </Flex>
           </Box>
         )}
 
