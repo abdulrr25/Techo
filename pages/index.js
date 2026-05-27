@@ -140,7 +140,7 @@ export default function Home() {
                   <Flex gap={3} wrap="wrap" justify="center">
                     <button className="btn-primary" onClick={connect}
                       style={{ height: 40, padding: "0 22px", fontSize: 14 }}>
-                      🦊 Connect MetaMask
+                      Connect Wallet
                     </button>
                     <button className="btn-outline-pill" onClick={() => router.push("/gigs")}
                       style={{ height: 40, padding: "0 22px", fontSize: 14 }}>
@@ -266,7 +266,7 @@ export default function Home() {
                   {!isConnected ? (
                     <button className="btn-primary" onClick={connect}
                       style={{ height: 40, padding: "0 24px", fontSize: 14 }}>
-                      🦊 Get Started Free
+                      Get Started Free
                     </button>
                   ) : (
                     <>
