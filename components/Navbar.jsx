@@ -8,6 +8,7 @@ const NAV_ITEMS = [
   { label: "Browse Classes", href: "/gigs" },
   { label: "Host Class",     href: "/host-class" },
   { label: "My Classes",     href: "/my-classes" },
+  { label: "Wallet",         href: "/wallet" },
 ];
 
 export default function Navbar() {

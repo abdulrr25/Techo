@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect } from "react";
-import { useWalletClient } from "wagmi";
+import { useWallets } from "@privy-io/react-auth";
 import { BrowserProvider, Contract, parseEther, formatEther } from "ethers";
 import { CFA_FORWARDER_ABI, SUPER_TOKEN_ABI } from "../constants/superfluidAbi";
 
@@ -8,9 +8,10 @@ const SUPER_TOKEN_ADDRESS = process.env.NEXT_PUBLIC_SUPER_TOKEN_ADDRESS;
 
 // Status: idle | wrapping | creating | streaming | deleting | stopped | error
 export function useStream({ senderAddress, receiverAddress, flowRate }) {
-  // wagmi walletClient works for BOTH MetaMask and Privy embedded wallets —
-  // never read window.ethereum directly here as embedded wallets won't have it.
-  const { data: walletClient } = useWalletClient();
+  // Use Privy's direct EIP-1193 provider instead of wagmi's walletClient.
+  // This is available immediately after login and works for both MetaMask
+  // (injected) and Privy embedded wallets without needing the wagmi bridge.
+  const { wallets } = useWallets();
 
   const [status, setStatus] = useState("idle");
   const [error, setError] = useState(null);
@@ -29,15 +30,15 @@ export function useStream({ senderAddress, receiverAddress, flowRate }) {
   }, [status, streamStartTime]);
 
   // ── Signer helper ──────────────────────────────────────────────────────────
-  // Uses wagmi walletClient transport so this works for MetaMask AND Privy
-  // embedded wallets. Do NOT change to window.ethereum.
+  // Uses Privy's wallet.getEthereumProvider() — works for MetaMask (injected)
+  // AND Privy embedded wallets. Never reads window.ethereum directly.
   const getSigner = useCallback(async () => {
-    if (!walletClient) {
-      throw new Error("No wallet connected");
-    }
-    const provider = new BrowserProvider(walletClient.transport);
+    const wallet = wallets[0];
+    if (!wallet) throw new Error("No wallet connected");
+    const ethProvider = await wallet.getEthereumProvider();
+    const provider = new BrowserProvider(ethProvider);
     return provider.getSigner();
-  }, [walletClient]);
+  }, [wallets[0]?.address]);
 
   const getForwarder = useCallback(async (signer) =>
     new Contract(FORWARDER_ADDRESS, CFA_FORWARDER_ABI, signer), []);
